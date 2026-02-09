@@ -1,0 +1,79 @@
+2026-02-09T04:26:07.257664Z  INFO tailwindcss_oxide::scanner: Provided sources:
+2026-02-09T04:26:07.257838Z  INFO tailwindcss_oxide::scanner: Source: PublicSourceEntry { base: "D:\\__AMLAudit_x7\\dashboard", pattern: "**/*", negated: false }
+2026-02-09T04:26:07.258233Z  INFO tailwindcss_oxide::scanner: Optimized sources:
+2026-02-09T04:26:07.258278Z  INFO tailwindcss_oxide::scanner: Source: Auto { base: "D:\\__AMLAudit_x7\\dashboard" }
+2026-02-09T04:26:07.261095Z  INFO scan_sources: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.263318Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app"
+2026-02-09T04:26:07.263603Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\components"
+2026-02-09T04:26:07.266548Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\components\\Sidebar.tsx"
+2026-02-09T04:26:07.266712Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\globals.css"
+2026-02-09T04:26:07.266806Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\layout.tsx"
+2026-02-09T04:26:07.266897Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\page.tsx"
+2026-02-09T04:26:07.267026Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\eslint.config.mjs"
+2026-02-09T04:26:07.267172Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\lib"
+2026-02-09T04:26:07.267417Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\lib\\db.ts"
+2026-02-09T04:26:07.267547Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\next.config.ts"
+2026-02-09T04:26:07.267864Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\package.json"
+2026-02-09T04:26:07.267951Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\postcss.config.mjs"
+2026-02-09T04:26:07.268083Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\prisma"
+2026-02-09T04:26:07.268333Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\prisma\\schema.prisma"
+2026-02-09T04:26:07.268564Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public"
+2026-02-09T04:26:07.268813Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public\\file.svg"
+2026-02-09T04:26:07.268934Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public\\globe.svg"
+2026-02-09T04:26:07.269044Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public\\next.svg"
+2026-02-09T04:26:07.269162Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public\\vercel.svg"
+2026-02-09T04:26:07.269260Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public\\window.svg"
+2026-02-09T04:26:07.269380Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\README.md"
+2026-02-09T04:26:07.269484Z  INFO scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\tsconfig.json"
+2026-02-09T04:26:07.269647Z  INFO scan_sources: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.269665Z  INFO extract_candidates: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.269675Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.269684Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading 16 file(s)
+2026-02-09T04:26:07.270409Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\prisma\\schema.prisma"
+2026-02-09T04:26:07.270406Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\app\\components\\Sidebar.tsx"
+2026-02-09T04:26:07.270409Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\lib\\db.ts"
+2026-02-09T04:26:07.270533Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\app\\page.tsx"
+2026-02-09T04:26:07.270547Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\public\\file.svg"
+2026-02-09T04:26:07.270453Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\public\\vercel.svg"
+2026-02-09T04:26:07.270596Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\app\\layout.tsx"
+2026-02-09T04:26:07.270623Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\eslint.config.mjs"
+2026-02-09T04:26:07.270686Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\public\\next.svg"
+2026-02-09T04:26:07.270693Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\public\\globe.svg"
+2026-02-09T04:26:07.270710Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\postcss.config.mjs"
+2026-02-09T04:26:07.270689Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\package.json"
+2026-02-09T04:26:07.270723Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\next.config.ts"
+2026-02-09T04:26:07.270761Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\public\\window.svg"
+2026-02-09T04:26:07.270770Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\README.md"
+2026-02-09T04:26:07.270775Z  INFO tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\tsconfig.json"
+2026-02-09T04:26:07.270912Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.270933Z  INFO extract_candidates:parse_all_blobs: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.270943Z  INFO extract_candidates:parse_all_blobs:extract: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.271586Z  INFO extract_candidates:parse_all_blobs:extract: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.271609Z  INFO extract_candidates:parse_all_blobs: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.271620Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.271627Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading 1 file(s)
+2026-02-09T04:26:07.271785Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: Reading "D:\\__AMLAudit_x7\\dashboard\\app\\globals.css"
+2026-02-09T04:26:07.271803Z  INFO extract_candidates:read_all_files: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.271820Z  INFO extract_candidates:extract_css_variables: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.271830Z  INFO extract_candidates:extract_css_variables:extract: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.271963Z  INFO extract_candidates:extract_css_variables:extract: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.271980Z  INFO extract_candidates:extract_css_variables: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.272428Z  INFO extract_candidates: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.273063Z  INFO get_files: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.273080Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.274873Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app"
+2026-02-09T04:26:07.275101Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\components"
+2026-02-09T04:26:07.275870Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\lib"
+2026-02-09T04:26:07.276730Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\prisma"
+2026-02-09T04:26:07.277009Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public"
+2026-02-09T04:26:07.277980Z  INFO get_files:scan_sources: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.278186Z  INFO get_files: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.278474Z  INFO get_globs: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.278494Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: enter
+2026-02-09T04:26:07.280461Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app"
+2026-02-09T04:26:07.280677Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\app\\components"
+2026-02-09T04:26:07.281167Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\lib"
+2026-02-09T04:26:07.281822Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\prisma"
+2026-02-09T04:26:07.282245Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: Discovering "D:\\__AMLAudit_x7\\dashboard\\public"
+2026-02-09T04:26:07.282799Z  INFO get_globs:scan_sources: tailwindcss_oxide::scanner: exit
+2026-02-09T04:26:07.287983Z  INFO get_globs: tailwindcss_oxide::scanner: exit

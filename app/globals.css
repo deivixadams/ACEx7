@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-sidebar: var(--sidebar-bg);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --shadow-duralux: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --radius-card: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Duralux Light Theme */
+  --background: #F3F4F6;
+  --foreground: #283C50;
+  --primary: #3454D1;
+  --primary-foreground: #ffffff;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-foreground: #283C50;
+
+  --header-bg: #ffffff;
+  --header-border: #E5E7EB;
+
+  --card: #ffffff;
+  --card-foreground: #283C50;
+  --card-border: #E5E7EB;
+  --border: #E5E7EB;
+
+  --muted: #F9FAFB;
+  --muted-foreground: #64748B;
+
+  --accent: #3454D1;
+  --accent-foreground: #ffffff;
+
+  --status-bar-bg: #3454D1;
+}
+
+.dark {
+  /* Duralux Modern Dark Theme */
+  --background: #14142B;
+  --foreground: #D9DBE9;
+  --primary: #3454D1;
+  --primary-foreground: #ffffff;
+
+  --sidebar-bg: #1A1A2E;
+  --sidebar-foreground: #D9DBE9;
+
+  --header-bg: #1A1A2E;
+  --header-border: rgba(255, 255, 255, 0.1);
+
+  --card: #1A1A2E;
+  --card-foreground: #ffffff;
+  --card-border: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.1);
+
+  --muted: #24244D;
+  --muted-foreground: #A0A3BD;
+
+  --accent: #3454D1;
+  --accent-foreground: #ffffff;
+
+  --status-bar-bg: #3454D1;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .shadow-soft {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-duralux {
+    @apply bg-[var(--card)] border border-[var(--card-border)] rounded-[10px] shadow-soft;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.2);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }

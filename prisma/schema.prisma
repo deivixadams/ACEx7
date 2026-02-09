@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Territory {
+  id_territory   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codigo         String?
+  nombre         String
+  region         String?
+  estado         String
+  version        String?
+  creado_en      DateTime? @db.Timestamptz(6)
+  actualizado_en DateTime? @db.Timestamptz(6)
+  domain         Domain[]
+
+  @@map("territory")
+}
+
+model Domain {
+  id_dominio     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_territory   String    @db.Uuid
+  codigo         String?
+  nombre         String
+  descripcion    String?
+  estado         String
+  version        String?
+  creado_en      DateTime? @db.Timestamptz(6)
+  actualizado_en DateTime? @db.Timestamptz(6)
+  territory      Territory @relation(fields: [id_territory], references: [id_territory])
+  modules        Module[]
+
+  @@map("domain")
+}
+
+model Module {
+  id_modulo      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_dominio     String         @db.Uuid
+  codigo         String?
+  nombre         String
+  descripcion    String?
+  estado         String
+  version        String?
+  creado_en      DateTime?      @db.Timestamptz(6)
+  actualizado_en DateTime?      @db.Timestamptz(6)
+  domain         Domain         @relation(fields: [id_dominio], references: [id_dominio])
+  requirements   Requirements[]
+
+  @@map("module")
+}
+
+model Requirements {
+  id_requerimiento String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_modulo        String        @db.Uuid
+  sujeto_exigido   String?
+  tipo_sujeto      String?
+  codigo           String?
+  titulo           String
+  descripcion      String?
+  categoria        String?
+  nivel_riesgo     String?
+  doc_codigo       String?
+  base_normativa   String?
+  source_ref       String?
+  source_excerpt   String?
+  estado           String
+  version          String?
+  creado_en        DateTime?     @db.Timestamptz(6)
+  actualizado_en   DateTime?     @db.Timestamptz(6)
+  module           Module        @relation(fields: [id_modulo], references: [id_modulo])
+  risks            RiskByReq[]
+  tests_map        TestReqMap[]
+
+  @@map("requirements")
+}
+
+model RiskByReq {
+  id_riesgo         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_requerimiento  String              @db.Uuid
+  codigo            String?
+  tipo              String?
+  descripcion       String?
+  impacto           String?
+  probabilidad      String?
+  nivel_riesgo      String?
+  estado            String
+  version           String?
+  creado_en         DateTime?           @db.Timestamptz(6)
+  actualizado_en    DateTime?           @db.Timestamptz(6)
+  requirement       Requirements        @relation(fields: [id_requerimiento], references: [id_requerimiento])
+  controls_links    RiskControlsLink[]
+
+  @@map("risk_by_req")
+}
+
+model Controls {
+  id_control         String              @id
+  codigo             String?
+  nombre             String
+  tipo_control       String?
+  naturaleza         String?
+  descripcion        String?
+  frecuencia         String?
+  dueno              String?
+  evidencia_esperada String?
+  sistema_fuente     String?
+  estado             String
+  version            String?
+  creado_en          DateTime?           @db.Timestamptz(6)
+  actualizado_en     DateTime?           @db.Timestamptz(6)
+  risks_links        RiskControlsLink[]
+  tests_map          TestControlMap[]
+
+  @@map("controls")
+}
+
+model RiskControlsLink {
+  id_riesgo String    @db.Uuid
+  id_control String
+  risk      RiskByReq @relation(fields: [id_riesgo], references: [id_riesgo])
+  control   Controls  @relation(fields: [id_control], references: [id_control])
+
+  @@id([id_riesgo, id_control])
+  @@map("risk_controls_link")
+}
+
+model TestAll {
+  id_prueba        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codigo_prueba    String
+  nombre           String
+  id_tipo_prueba   String
+  id_clasificacion String
+  prueba_version   String
+  id_schedule      String?          @db.Uuid
+  id_trigger       String?
+  id_recurrencia   String?
+  referencia_legal String?
+  descripcion      String?
+  estado           Boolean          @default(true)
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime         @default(now()) @db.Timestamptz(6)
+  req_maps         TestReqMap[]
+  control_maps     TestControlMap[]
+
+  @@map("test_all")
+}
+
+model TestReqMap {
+  id                   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  prueba_id            String       @db.Uuid
+  legacy_codigo_prueba String
+  requerimiento_id     String?      @db.Uuid
+  requerimiento_codigo String?
+  objetivo_auditoria   String?
+  notas_auditor        String?
+  test                 TestAll      @relation(fields: [prueba_id], references: [id_prueba])
+  requirement          Requirements? @relation(fields: [requerimiento_id], references: [id_requerimiento])
+
+  @@map("test_req_map")
+}
+
+model TestControlMap {
+  id_prueba          String   @db.Uuid
+  id_control         String
+  objetivo_auditoria String?
+  notas_auditor      String?
+  test               TestAll  @relation(fields: [id_prueba], references: [id_prueba])
+  control            Controls @relation(fields: [id_control], references: [id_control])
+
+  @@id([id_prueba, id_control])
+  @@map("test_control_map")
+}
