@@ -15,14 +15,15 @@
 :root {
   /* Premium High-Contrast Light Theme - DEFAULT */
   --background: #f8fafc;
-  --foreground: #0f172a;
+  --foreground: #1e293b;
+  /* Slate 800 - Stronger contrast */
   /* Slate 900 - Deep Charcoal */
   --primary: #2563eb;
   /* Professional Blue (SaaS style) */
   --primary-foreground: #ffffff;
 
   --sidebar-bg: #ffffff;
-  --sidebar-foreground: #334155;
+  --sidebar-foreground: #475569;
 
   --header-bg: #ffffff;
   --header-border: #e2e8f0;
@@ -38,9 +39,10 @@
   --accent: #2563eb;
   --accent-foreground: #ffffff;
 
-  --status-bar-bg: #1e293b;
+  --status-bar-bg: #0f172a;
 
-  --item-text: #1e40af;
+  --item-text: #334155;
+  /* Slate 700 - Highly readable */
   /* Deep Blue for traceability in light mode */
 }
 

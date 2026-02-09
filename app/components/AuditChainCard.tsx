@@ -49,19 +49,16 @@ const AuditChainCard: React.FC<AuditChainCardProps> = ({
     return (
         <div className="flex flex-col h-[460px] bg-[var(--card)] border border-[var(--card-border)] rounded-[12px] shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-6 border-b border-[var(--card-border)] flex flex-col gap-4 bg-[var(--background)]/30">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-                            <Icon className="h-6 w-6" />
-                        </div>
-                        <div className="flex flex-col">
-                            <h3 className="text-[13px] font-medium uppercase tracking-[2px] text-[var(--muted-foreground)] mb-0.5">{title}</h3>
-                            <span className="text-3xl font-normal tracking-tight text-[var(--foreground)] leading-none">
-                                {items.length}
-                            </span>
-                        </div>
+            <div className="px-6 py-5 border-b border-[var(--card-border)] flex flex-col gap-3 bg-[var(--background)]/30">
+                <h3 className="text-[13px] font-semibold uppercase tracking-[2px] text-slate-500 dark:text-slate-400 ml-1">{title}</h3>
+
+                <div className="flex items-center gap-4">
+                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+                        <Icon className="h-6 w-6" />
                     </div>
+                    <span className="text-4xl font-light tracking-tight text-[var(--foreground)] leading-none">
+                        {items.length}
+                    </span>
                 </div>
                 {/* Large Counter - Non bold */}
 

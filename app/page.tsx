@@ -145,7 +145,7 @@ export default function Dashboard() {
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-[32px] font-bold tracking-tight text-[var(--foreground)] mb-2 uppercase">Visión de Auditoría</h1>
+          <h1 className="text-[32px] font-bold tracking-tight text-slate-700 dark:text-slate-200 mb-2 uppercase">Visión de Auditoría</h1>
           <div className="flex items-center gap-3">
             <div className="px-3 py-1 bg-primary/5 rounded-full border border-primary/20 flex items-center gap-2">
               <LayoutGrid className="h-3 w-3 text-primary" />
