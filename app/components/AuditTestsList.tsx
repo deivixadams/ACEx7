@@ -16,12 +16,12 @@ interface AuditTestsListProps {
 
 const AuditTestsList: React.FC<AuditTestsListProps> = ({ tests, isLoading }) => {
     return (
-        <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-[10px] overflow-hidden mt-8 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-[12px] overflow-hidden mt-8 shadow-duralux hover:shadow-duralux-hover transition-all duration-300">
             {/* Header */}
-            <div className="px-8 py-5 border-b border-[var(--card-border)] bg-white/50 dark:bg-black/5">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--foreground)]/80 flex items-center gap-3">
+            <div className="px-8 py-6 border-b border-[var(--card-border)] bg-white/50 dark:bg-black/5">
+                <h3 className="text-[16px] font-extrabold uppercase tracking-widest text-[#1B2559] dark:text-white flex items-center gap-4">
                     Pruebas de Auditoría Vinculadas
-                    <span className="px-2.5 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-bold border border-primary/20">
+                    <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-[12px] font-black border border-primary/20">
                         {tests.length}
                     </span>
                 </h3>
@@ -31,26 +31,26 @@ const AuditTestsList: React.FC<AuditTestsListProps> = ({ tests, isLoading }) => 
             <div className="p-0 overflow-x-auto custom-scrollbar">
                 <table className="w-full text-left border-collapse min-w-[1000px]">
                     <thead>
-                        <tr className="bg-gray-50/50 dark:bg-black/10 border-b border-[var(--card-border)]">
-                            <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground w-[150px]">Código</th>
-                            <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground w-[300px]">Nombre de la Prueba</th>
-                            <th className="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Descripción Detallada</th>
+                        <tr className="bg-muted border-b border-[var(--card-border)]">
+                            <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[3px] text-muted-foreground w-[180px]">Código</th>
+                            <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[3px] text-muted-foreground w-[350px]">Nombre de la Prueba</th>
+                            <th className="px-8 py-5 text-[11px] font-black uppercase tracking-[3px] text-muted-foreground">Descripción Detallada</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--card-border)]">
                         {isLoading ? (
                             Array.from({ length: 3 }).map((_, i) => (
                                 <tr key={i} className="animate-pulse">
-                                    <td className="px-8 py-6"><div className="h-4 bg-muted rounded w-20" /></td>
-                                    <td className="px-8 py-6"><div className="h-4 bg-muted rounded w-48" /></td>
-                                    <td className="px-8 py-6"><div className="h-4 bg-muted rounded w-full" /></td>
+                                    <td className="px-8 py-8"><div className="h-5 bg-muted rounded w-24" /></td>
+                                    <td className="px-8 py-8"><div className="h-5 bg-muted rounded w-64" /></td>
+                                    <td className="px-8 py-8"><div className="h-5 bg-muted rounded w-full" /></td>
                                 </tr>
                             ))
                         ) : tests.length === 0 ? (
                             <tr>
-                                <td colSpan={3} className="px-8 py-16 text-center">
-                                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest opacity-30">
-                                        No hay pruebas que coincidan con los filtros seleccionados
+                                <td colSpan={3} className="px-8 py-24 text-center">
+                                    <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-[4px] opacity-20">
+                                        No hay pruebas vinculadas
                                     </p>
                                 </td>
                             </tr>
@@ -58,15 +58,15 @@ const AuditTestsList: React.FC<AuditTestsListProps> = ({ tests, isLoading }) => 
                             tests.map((test) => (
                                 <tr
                                     key={test.id_prueba}
-                                    className="hover:bg-muted/50 transition-colors group cursor-default"
+                                    className="hover:bg-muted/30 transition-colors group cursor-default"
                                 >
-                                    <td className="px-8 py-5 text-[11px] font-black text-primary uppercase tracking-tighter">
+                                    <td className="px-8 py-8 text-[12px] font-black text-primary uppercase tracking-widest">
                                         {test.codigo}
                                     </td>
-                                    <td className="px-8 py-5 text-sm font-bold text-[var(--foreground)]">
+                                    <td className="px-8 py-8 text-[15px] font-bold text-[#2B3674] dark:text-white/90">
                                         {test.nombre}
                                     </td>
-                                    <td className="px-8 py-5 text-sm text-muted-foreground leading-relaxed">
+                                    <td className="px-8 py-8 text-[14px] text-muted-foreground leading-relaxed">
                                         {test.descripcion}
                                     </td>
                                 </tr>
