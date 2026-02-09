@@ -1,6 +1,14 @@
 'use client';
 
 import React from 'react';
+import {
+    Layers,
+    FileText,
+    AlertTriangle,
+    ShieldCheck,
+    ChevronRight,
+    LucideIcon
+} from 'lucide-react';
 
 interface AuditItem {
     id: string;
@@ -18,6 +26,15 @@ interface AuditChainCardProps {
     colorClass?: string;
 }
 
+const getIconForTitle = (title: string): LucideIcon => {
+    const t = title.toLowerCase();
+    if (t.includes('módulo')) return Layers;
+    if (t.includes('requerimiento')) return FileText;
+    if (t.includes('riesgo')) return AlertTriangle;
+    if (t.includes('control')) return ShieldCheck;
+    return Layers;
+};
+
 const AuditChainCard: React.FC<AuditChainCardProps> = ({
     title,
     items,
@@ -27,25 +44,38 @@ const AuditChainCard: React.FC<AuditChainCardProps> = ({
     isLoading,
     colorClass = 'primary'
 }) => {
+    const Icon = getIconForTitle(title);
+
     return (
-        <div className="flex flex-col h-[440px] bg-[var(--card)] border border-[var(--card-border)] rounded-[14px] shadow-duralux hover:shadow-duralux-hover transition-all duration-300 group">
+        <div className="flex flex-col h-[460px] bg-[var(--card)] border border-[var(--card-border)] rounded-[12px] shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-5 border-b border-[var(--card-border)] flex items-center justify-between bg-white/30 dark:bg-black/10">
-                <h3 className="text-[13px] font-black uppercase tracking-[1.5px] text-[var(--foreground)] opacity-60 italic">{title}</h3>
-                <span className="px-3.5 py-1.5 rounded-lg text-[14px] font-black bg-primary/5 text-primary border-2 border-primary/20 shadow-inner">
-                    {items.length}
-                </span>
+            <div className="px-6 py-6 border-b border-[var(--card-border)] flex flex-col gap-4 bg-[var(--background)]/30">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+                            <Icon className="h-6 w-6" />
+                        </div>
+                        <div className="flex flex-col">
+                            <h3 className="text-[13px] font-medium uppercase tracking-[2px] text-[var(--muted-foreground)] mb-0.5">{title}</h3>
+                            <span className="text-3xl font-normal tracking-tight text-[var(--foreground)] leading-none">
+                                {items.length}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {/* Large Counter - Non bold */}
+
             </div>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1.5 bg-white dark:bg-transparent">
                 {isLoading ? (
                     <div className="h-full flex items-center justify-center">
-                        <div className="animate-spin h-7 w-7 border-2 border-primary border-t-transparent rounded-full" />
+                        <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
                     </div>
                 ) : items.length === 0 ? (
-                    <div className="h-full flex items-center justify-center text-[12px] font-bold text-[var(--foreground)] opacity-20 uppercase tracking-[3px] text-center px-8 leading-relaxed">
-                        Sin datos vinculados
+                    <div className="h-full flex items-center justify-center text-[12px] text-[var(--muted-foreground)] uppercase tracking-[2px] text-center px-6 italic">
+                        Sin vinculaciones
                     </div>
                 ) : (
                     items.map((item) => (
@@ -53,27 +83,23 @@ const AuditChainCard: React.FC<AuditChainCardProps> = ({
                             key={item.id}
                             onClick={() => onSelect(item.id)}
                             onDoubleClick={() => onDoubleClick(item.id)}
-                            className={`w-full text-left px-6 py-5 rounded-2xl transition-all flex flex-col gap-2 border-2 ${selectedId === item.id
-                                    ? 'bg-primary border-primary text-white shadow-[0_15px_30px_-5px_rgba(67,24,255,0.4)] scale-[0.97]'
-                                    : 'bg-transparent border-transparent hover:bg-muted text-[var(--item-text)]'
+                            className={`w-full text-left px-5 py-4 rounded-xl transition-all flex flex-col gap-1.5 group/item border ${selectedId === item.id
+                                ? 'bg-primary border-primary text-white shadow-lg scale-[0.98]'
+                                : 'bg-transparent border-transparent hover:bg-[var(--muted)] text-[var(--item-text)]'
                                 }`}
                         >
-                            <span className={`text-[11px] font-black uppercase tracking-[3px] ${selectedId === item.id ? 'text-white/70' : 'text-primary/70'}`}>
-                                {item.codigo || 'S/C'}
-                            </span>
-                            <span className={`text-[15px] font-extrabold leading-tight line-clamp-2 ${selectedId === item.id ? 'text-white' : 'text-[var(--item-text)]'}`}>
+                            <div className="flex items-center justify-between w-full">
+                                <span className={`text-[10px] font-medium uppercase tracking-[2px] ${selectedId === item.id ? 'text-white/70' : 'text-primary'}`}>
+                                    {item.codigo || 'S/C'}
+                                </span>
+                                {selectedId === item.id && <ChevronRight className="h-3 w-3 text-white/50" />}
+                            </div>
+                            <span className={`text-[16px] leading-snug font-normal line-clamp-2 ${selectedId === item.id ? 'text-white' : 'text-[var(--foreground)]'}`}>
                                 {item.nombre}
                             </span>
                         </button>
                     ))
                 )}
-            </div>
-
-            {/* Footer hint */}
-            <div className="px-5 py-3 border-t border-[var(--card-border)] bg-gray-50/30 dark:bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                <p className="text-[11px] font-black text-muted-foreground uppercase text-center tracking-widest italic opacity-60">
-                    Interactuar para Filtrar
-                </p>
             </div>
         </div>
     );

@@ -33,12 +33,12 @@ const Sidebar = () => {
         <aside className={`w-64 bg-[var(--sidebar-bg)] h-screen flex flex-col fixed left-0 top-0 border-r border-[var(--header-border)] z-50 transition-all duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <div className="p-6">
                 <div className="flex items-center gap-4 mb-12 px-2">
-                    <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/40">
-                        <Database className="h-6 w-6 text-white" />
+                    <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                        <Database className="h-7 w-7 text-white" />
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-[22px] font-black tracking-tighter text-[#1B2559] dark:text-white leading-none italic uppercase">ACE</span>
-                        <span className="text-[10px] font-black text-primary tracking-[4px] uppercase mt-1">CORE 2026</span>
+                    <div className="flex flex-col justify-center h-12">
+                        <span className="text-[24px] font-medium tracking-tight text-[var(--foreground)] leading-none mb-0.5">ACE-X7</span>
+                        <span className="text-[10px] font-medium text-[var(--muted-foreground)] tracking-[3px] uppercase">Audit Platform</span>
                     </div>
                 </div>
 
@@ -50,12 +50,12 @@ const Sidebar = () => {
                                 key={item.label}
                                 href={item.href}
                                 className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all group ${isActive
-                                        ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-[1.03]'
-                                        : 'text-[#A3AED0] hover:bg-muted hover:text-[#1B2559] dark:hover:text-white'
+                                    ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-[1.03]'
+                                    : 'text-[#64748b] hover:bg-[var(--muted)] hover:text-[var(--foreground)] dark:text-[#94a3b8]'
                                     }`}
                             >
-                                <item.icon className={`h-6 w-6 transition-transform ${isActive ? 'scale-100' : 'group-hover:scale-110'}`} />
-                                <span className={`text-[15px] font-bold tracking-tight ${isActive ? 'text-white' : ''}`}>{item.label}</span>
+                                <item.icon className={`h-5 w-5 transition-transform ${isActive ? 'scale-100' : 'group-hover:scale-110'}`} />
+                                <span className={`text-[15px] font-medium tracking-tight ${isActive ? 'text-white' : 'text-[#64748b] dark:text-[#94a3b8]'}`}>{item.label}</span>
                             </Link>
                         );
                     })}

@@ -13,66 +13,67 @@
 }
 
 :root {
-  /* Duralux Premium Light Theme - DEFAULT */
-  --background: #F4F7FE;
-  --foreground: #1B2559;
-  /* Ultra-Contrast Navy */
-  --primary: #4318FF;
-  /* Vibrant Blue/Indigo */
+  /* Premium High-Contrast Light Theme - DEFAULT */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  /* Slate 900 - Deep Charcoal */
+  --primary: #2563eb;
+  /* Professional Blue (SaaS style) */
   --primary-foreground: #ffffff;
 
   --sidebar-bg: #ffffff;
-  --sidebar-foreground: #2B3674;
+  --sidebar-foreground: #334155;
 
   --header-bg: #ffffff;
-  --header-border: #E9EDF7;
+  --header-border: #e2e8f0;
 
   --card: #ffffff;
-  --card-foreground: #2B3674;
-  --card-border: #E9EDF7;
-  --border: #E9EDF7;
+  --card-foreground: #1e293b;
+  --card-border: #e2e8f0;
+  --border: #e2e8f0;
 
-  --muted: #F4F7FE;
-  --muted-foreground: #8F9BBA;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
 
-  --accent: #4318FF;
+  --accent: #2563eb;
   --accent-foreground: #ffffff;
 
-  --status-bar-bg: #4318FF;
+  --status-bar-bg: #1e293b;
 
-  --item-text: #2B3674;
-  /* Distinct Blue for Light Mode */
+  --item-text: #1e40af;
+  /* Deep Blue for traceability in light mode */
 }
 
 .dark {
-  /* Duralux Modern Dark Theme */
-  --background: #0B1437;
-  --foreground: #FFFFFF;
-  /* High clarity White */
-  --primary: #7551FF;
+  /* VS Code Style Dark Theme */
+  --background: #1e1e1e;
+  --foreground: #cccccc;
+  /* Standard VS Code text color */
+  --primary: #007acc;
+  /* VS Code Blue */
   --primary-foreground: #ffffff;
 
-  --sidebar-bg: #111C44;
-  --sidebar-foreground: #D9DBE9;
+  --sidebar-bg: #252526;
+  --sidebar-foreground: #cccccc;
 
-  --header-bg: #111C44;
-  --header-border: rgba(255, 255, 255, 0.05);
+  --header-bg: #252526;
+  --header-border: #333333;
 
-  --card: #111C44;
-  --card-foreground: #ffffff;
-  --card-border: rgba(255, 255, 255, 0.1);
-  --border: rgba(255, 255, 255, 0.1);
+  --card: #2d2d2d;
+  --card-foreground: #cccccc;
+  --card-border: #3e3e3e;
+  --border: #333333;
 
-  --muted: #1B254B;
-  --muted-foreground: #A3AED0;
+  --muted: #37373d;
+  --muted-foreground: #858585;
 
-  --accent: #7551FF;
+  --accent: #007acc;
   --accent-foreground: #ffffff;
 
-  --status-bar-bg: #7551FF;
+  --status-bar-bg: #007acc;
 
   --item-text: #ffffff;
-  /* Clearly White for Dark Mode */
+  /* White only in Dark Mode */
 }
 
 body {
@@ -82,6 +83,8 @@ body {
   -webkit-font-smoothing: antialiased;
   font-size: 15px;
   line-height: 1.6;
+  font-weight: 400;
+  /* Default weight increased for clarity without bolding */
 }
 
 @layer components {
@@ -92,33 +95,43 @@ body {
   .card-duralux {
     @apply bg-[var(--card)] border border-[var(--card-border)] rounded-[12px] shadow-duralux;
   }
-
-  .glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
 }
 
-/* Typography Overrides */
+/* Typography Overrides - Removing aggressive bolding */
 h1,
 h2,
 h3,
 h4 {
-  @apply font-bold tracking-tight text-[#1B2559] dark:text-white;
+  font-weight: 500;
+  /* Medium instead of Bold */
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+/* Global weight adjustments */
+.font-black,
+.font-extrabold {
+  font-weight: 600;
+  /* Downsampling to Semibold/Medium */
+}
+
+.font-bold {
+  font-weight: 500;
 }
 
 /* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--background);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(163, 174, 208, 0.3);
+  background: var(--muted-foreground);
+  opacity: 0.3;
+  border: 2px solid var(--background);
   border-radius: 10px;
 }
 
