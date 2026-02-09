@@ -1,0 +1,37 @@
+# Netlify / Vercel / Next.js
+node_modules
+.next
+out
+build
+.vercel
+.netlify
+
+# API Keys & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs & System
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Project Specific Exclusions
+.agent
+dashboard_o
+XDATA
+logs
+tmp
+
+# Database
+*.db
+*.sqlite
+prisma/dev.db
