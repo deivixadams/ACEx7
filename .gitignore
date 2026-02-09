@@ -31,7 +31,12 @@ XDATA
 logs
 tmp
 
+#Deivis
+all_skills/
+
 # Database
 *.db
 *.sqlite
 prisma/dev.db
+
+
