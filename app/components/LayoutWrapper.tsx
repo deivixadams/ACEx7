@@ -17,7 +17,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         <body className={`${inter.className} flex bg-background h-screen overflow-hidden transition-all duration-300`}>
             <ThemeProvider
                 attribute="class"
-                defaultTheme="dark"
+                defaultTheme="light"
                 enableSystem
                 disableTransitionOnChange
             >

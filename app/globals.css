@@ -13,10 +13,10 @@
 }
 
 :root {
-  /* Duralux Premium Light Theme */
+  /* Duralux Premium Light Theme - DEFAULT */
   --background: #F4F7FE;
   --foreground: #1B2559;
-  /* Navy darker for better contrast */
+  /* Ultra-Contrast Navy */
   --primary: #4318FF;
   /* Vibrant Blue/Indigo */
   --primary-foreground: #ffffff;
@@ -39,12 +39,16 @@
   --accent-foreground: #ffffff;
 
   --status-bar-bg: #4318FF;
+
+  --item-text: #2B3674;
+  /* Distinct Blue for Light Mode */
 }
 
 .dark {
   /* Duralux Modern Dark Theme */
   --background: #0B1437;
   --foreground: #FFFFFF;
+  /* High clarity White */
   --primary: #7551FF;
   --primary-foreground: #ffffff;
 
@@ -66,6 +70,9 @@
   --accent-foreground: #ffffff;
 
   --status-bar-bg: #7551FF;
+
+  --item-text: #ffffff;
+  /* Clearly White for Dark Mode */
 }
 
 body {
@@ -74,7 +81,6 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 15px;
-  /* Base font size increased */
   line-height: 1.6;
 }
 
