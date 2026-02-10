@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
     BarChart3,
     BookOpen,
@@ -18,15 +18,19 @@ import { useSidebar } from '../context/SidebarContext';
 const Sidebar = () => {
     const { isSidebarOpen } = useSidebar();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentView = searchParams.get('view');
 
     const menuItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
-        { icon: BookOpen, label: 'Corpus Auditoría', href: '/corpus' },
-        { icon: FileCheck, label: 'Requerimientos', href: '/requirements' },
-        { icon: ShieldAlert, label: 'Riesgos', href: '/risks' },
-        { icon: BarChart3, label: 'Controles', href: '/controls' },
-        { icon: Settings, label: 'Pruebas', href: '/tests' },
-        { icon: Map, label: 'Territorios', href: '/territories' },
+        { icon: ShieldAlert, label: 'Riesgos', href: '/?view=risks', id: 'risks' },
+        { icon: LayoutDashboard, label: 'Resumen', href: '/?view=summary', id: 'summary' },
+        { icon: FileCheck, label: 'Requerimientos', href: '/?view=requirements', id: 'requirements' },
+        { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
+        { icon: Settings, label: 'Pruebas', href: '/?view=tests', id: 'tests' },
+
+        // These seem to be separate pages based on original code, leave them as generic links for now if they exist
+        { icon: BookOpen, label: 'Corpus Auditoría', href: '/corpus', id: 'corpus' },
+        { icon: Map, label: 'Territorios', href: '/territories', id: 'territories' },
     ];
 
     return (
@@ -44,7 +48,17 @@ const Sidebar = () => {
 
                 <nav className="space-y-2">
                     {menuItems.map((item) => {
-                        const isActive = pathname === item.href;
+                        // Determine active state
+                        let isActive = false;
+                        if (item.href.startsWith('/?view=')) {
+                            // It's a view toggle on the home page
+                            const viewParam = item.href.split('=')[1];
+                            isActive = pathname === '/' && (currentView === viewParam || (!currentView && viewParam === 'risks' && item.id === 'risks'));
+                        } else {
+                            // It's a different route
+                            isActive = pathname === item.href;
+                        }
+
                         return (
                             <Link
                                 key={item.label}

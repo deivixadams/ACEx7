@@ -1,44 +1,84 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
+  Rocket,
   FilterX,
-  LayoutGrid,
-  SearchX
+  BookOpen
 } from 'lucide-react';
-import AuditChainCard from './components/AuditChainCard';
-import AuditTestsList from './components/AuditTestsList';
+
+// Views
+import RisksView from './components/views/RisksView';
+import RequirementsView from './components/views/RequirementsView';
+import ControlsView from './components/views/ControlsView';
+import TestsView from './components/views/TestsView';
+import SummaryView from './components/views/SummaryView';
 
 interface AuditItem {
   id: string;
-  id_modulo?: string;
-  id_requerimiento?: string;
-  id_riesgo?: string;
-  id_control?: string;
   nombre: string;
   codigo?: string;
+  tipo?: string;
+  descripcion_full?: string;
+  impacto?: string;
+  probabilidad?: string;
+  nivel_riesgo?: string;
+  id_requerimiento?: string;
+}
+
+interface ControlItem {
+  id: string;
+  nombre: string;
+  codigo?: string;
+  tipo_control?: string;
+  naturaleza?: string;
+  frecuencia?: string;
+  descripcion?: string;
+  evidencia_esperada?: string;
+}
+
+interface TestItem {
+  id_prueba: string;
+  nombre: string;
+  descripcion?: string;
+  codigo?: string;
+  id_tipo_prueba?: string;
+}
+
+interface RequirementItem {
+  id_requerimiento: string;
+  titulo: string;
+  nombre?: string;
+  codigo?: string;
+  categoria?: string;
+  base_normativa?: string;
+  descripcion?: string;
+  source_ref?: string;
+  nivel_riesgo?: string;
 }
 
 interface AuditData {
-  modules: AuditItem[];
-  requirements: AuditItem[];
   risks: AuditItem[];
-  controls: AuditItem[];
-  links: { id_riesgo: string; id_control: string }[];
-  tests: any[];
-  testReqMaps: { prueba_id: string; requerimiento_id: string }[];
-  testControlMaps: { id_prueba: string; id_control: string }[];
+  controls: ControlItem[];
+  requirements: RequirementItem[];
+  riskControls: { id_riesgo: string, id_control: string }[];
+  testControlMaps: { id_prueba: string, id_control: string }[];
+  testReqMaps: { prueba_id: string, requerimiento_id: string }[];
+  tests: TestItem[];
+  summary?: any;
 }
 
+type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary';
+
 export default function Dashboard() {
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get('view') as ViewType;
+  const currentView = viewParam || 'risks';
+
   const [data, setData] = useState<AuditData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Selection state
-  const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>();
-  const [selectedReqId, setSelectedReqId] = useState<string | undefined>();
-  const [selectedRiskId, setSelectedRiskId] = useState<string | undefined>();
-  const [selectedControlId, setSelectedControlId] = useState<string | undefined>();
+  const [selectedRiskIds, setSelectedRiskIds] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,14 +87,27 @@ export default function Dashboard() {
         const json = await res.json();
 
         const normalizedData: AuditData = {
-          modules: json.modules || [],
-          requirements: (json.requirements || []).map((r: any) => ({ ...r, id: r.id_requerimiento })),
-          risks: (json.risks || []).map((r: any) => ({ ...r, id: r.id_riesgo })),
-          controls: (json.controls || []).map((c: any) => ({ ...c, id: c.id_control })),
-          links: json.links || [],
-          tests: json.tests || [],
+          risks: (json.risks || []).map((r: any) => ({
+            ...r,
+            id: r.id_riesgo,
+            levelScore: (() => {
+              const n = (r.nivel_riesgo || r.probabilidad || '').toUpperCase();
+              if (n.includes('ALTO') || n.includes('HIGH') || n.includes('CRITIC') || n.includes('EXTREM')) return 1;
+              if (n.includes('MEDIO') || n.includes('MEDIA') || n.includes('MEDIUM')) return 2;
+              if (n.includes('BAJO') || n.includes('BAJA') || n.includes('LOW')) return 3;
+              return 4;
+            })()
+          })).sort((a: any, b: any) => a.levelScore - b.levelScore),
+          controls: (json.controls || []).map((c: any) => ({
+            id: c.id_control,
+            ...c
+          })),
+          requirements: json.requirements || [],
+          riskControls: json.links || [],
+          testControlMaps: json.testControlMaps || [],
           testReqMaps: json.testReqMaps || [],
-          testControlMaps: json.testControlMaps || []
+          tests: json.tests || [],
+          summary: json.summary
         };
 
         setData(normalizedData);
@@ -67,189 +120,151 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const resetFilters = () => {
-    setSelectedModuleId(undefined);
-    setSelectedReqId(undefined);
-    setSelectedRiskId(undefined);
-    setSelectedControlId(undefined);
+  const handleLaunchAudit = () => {
+    alert('Iniciando proceso de auditoría ACEx7...');
   };
 
-  // Forward-Only Filtering Logic
-  const filteredResources = useMemo(() => {
-    if (!data) return null;
-
-    let visibleModules = [...data.modules];
-    let visibleReqs = [...data.requirements];
-    if (selectedModuleId) {
-      visibleReqs = visibleReqs.filter(r => r.id_modulo === selectedModuleId);
+  const handleRiskSelect = (id: string, isMulti: boolean) => {
+    if (isMulti) {
+      setSelectedRiskIds(prev =>
+        prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+      );
+    } else {
+      setSelectedRiskIds([id]);
     }
-
-    let visibleRisks = [...data.risks];
-    const currentReqIds = visibleReqs.map(r => r.id);
-    visibleRisks = visibleRisks.filter(ri => currentReqIds.includes(ri.id_requerimiento));
-
-    if (selectedReqId) {
-      visibleRisks = visibleRisks.filter(ri => ri.id_requerimiento === selectedReqId);
-    }
-
-    let visibleControls = [...data.controls];
-    const currentRiskIds = visibleRisks.map(ri => ri.id);
-    const linkedControlIdsForVisibleRisks = data.links
-      .filter(l => currentRiskIds.includes(l.id_riesgo))
-      .map(l => l.id_control);
-
-    visibleControls = visibleControls.filter(c => linkedControlIdsForVisibleRisks.includes(c.id));
-
-    if (selectedRiskId) {
-      const linkedControlIdsForSelectedRisk = data.links
-        .filter(l => l.id_riesgo === selectedRiskId)
-        .map(l => l.id_control);
-      visibleControls = visibleControls.filter(c => linkedControlIdsForSelectedRisk.includes(c.id));
-    }
-
-    let visibleTests = [...data.tests];
-    if (selectedModuleId || selectedReqId || selectedRiskId || selectedControlId) {
-      const finalReqIds = visibleReqs.map(r => r.id);
-      const finalControlIds = visibleControls.filter(c => {
-        if (!selectedControlId) return true;
-        return c.id === selectedControlId;
-      }).map(c => c.id);
-
-      const linkedTestIdsFromReqs = data.testReqMaps
-        .filter(m => finalReqIds.includes(m.requerimiento_id))
-        .map(m => m.prueba_id);
-
-      const linkedTestIdsFromControls = data.testControlMaps
-        .filter(m => finalControlIds.includes(m.id_control))
-        .map(m => m.id_prueba);
-
-      const allLinkedTestIds = new Set([...linkedTestIdsFromReqs, ...linkedTestIdsFromControls]);
-      visibleTests = data.tests.filter(t => allLinkedTestIds.has(t.id_prueba));
-    }
-
-    return {
-      modules: visibleModules,
-      requirements: visibleReqs,
-      risks: visibleRisks,
-      controls: visibleControls,
-      tests: visibleTests
-    };
-  }, [data, selectedModuleId, selectedReqId, selectedRiskId, selectedControlId]);
-
-  const handleDoubleClick = (id: string | undefined) => {
-    alert(`Navegando al detalle de: ${id}`);
   };
+
+  const resetSelection = () => {
+    setSelectedRiskIds([]);
+  };
+
+  // Filter Logic for Risk View
+  const { filteredControls, filteredTests } = useMemo(() => {
+    if (!data) return { filteredControls: [], filteredTests: [] };
+    if (selectedRiskIds.length === 0) return { filteredControls: [], filteredTests: [] };
+
+    const linkedControlIds = new Set<string>();
+    selectedRiskIds.forEach(riskId => {
+      data.riskControls
+        .filter(rc => rc.id_riesgo === riskId)
+        .forEach(rc => linkedControlIds.add(rc.id_control));
+    });
+
+    const controls = data.controls.filter(c => linkedControlIds.has(c.id));
+
+    const involvedTests = new Set<string>();
+
+    data.testControlMaps
+      .filter(tm => linkedControlIds.has(tm.id_control))
+      .forEach(tm => involvedTests.add(tm.id_prueba));
+
+    selectedRiskIds.forEach(riskId => {
+      const risk = data.risks.find(r => r.id === riskId);
+      if (risk && risk.id_requerimiento) {
+        data.testReqMaps
+          .filter(trm => trm.requerimiento_id === risk.id_requerimiento)
+          .forEach(trm => involvedTests.add(trm.prueba_id));
+      }
+    });
+
+    const tests = data.tests.filter(t => involvedTests.has(t.id_prueba));
+
+    return { filteredControls: controls, filteredTests: tests };
+
+  }, [data, selectedRiskIds]);
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000 pb-20">
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-[32px] font-bold tracking-tight text-slate-700 dark:text-slate-200 mb-2 uppercase">Visión de Auditoría</h1>
-          <div className="flex items-center gap-3">
-            <div className="px-3 py-1 bg-primary/5 rounded-full border border-primary/20 flex items-center gap-2">
-              <LayoutGrid className="h-3 w-3 text-primary" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[2px]">
-                Drill-down (A → D)
-              </span>
+    <div className="flex min-h-screen bg-slate-50/50">
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 pb-20">
+        <div className="max-w-[1700px] w-full mx-auto px-6 pt-8 space-y-6">
+
+          {/* Header section (Contextual buttons based on view?) */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="flex items-center gap-3">
+                <span className="bg-slate-800 text-white px-3 py-1 rounded text-sm font-black uppercase tracking-widest">
+                  {currentView === 'risks' ? 'Risk View' :
+                    currentView === 'requirements' ? 'Reqs View' :
+                      currentView === 'controls' ? 'Controls View' :
+                        currentView === 'tests' ? 'Tests View' : 'Resumen'}
+                </span>
+              </h1>
             </div>
-            <p className="text-[#A3AED0] text-[11px] font-bold uppercase tracking-[2px]">
-              Consolidado de Trazabilidad Normativa
-            </p>
+
+            <div className="flex items-center gap-3">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors shadow-sm">
+                <BookOpen className="h-4 w-4" />
+                Guía
+              </button>
+
+              <button
+                onClick={handleLaunchAudit}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider shadow-md hover:bg-emerald-700 transition-all"
+              >
+                <Rocket className="h-4 w-4" />
+                Auditar
+              </button>
+
+              {currentView === 'risks' && (
+                <button
+                  onClick={resetSelection}
+                  disabled={selectedRiskIds.length === 0}
+                  className={`
+                      flex items-center gap-2 px-4 py-2 rounded-lg text-white text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm
+                      ${selectedRiskIds.length > 0
+                      ? 'bg-slate-700 hover:bg-slate-800 cursor-pointer'
+                      : 'bg-slate-300 cursor-not-allowed'}
+                    `}
+                >
+                  <FilterX className="h-4 w-4" />
+                  Limpiar
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <button
-          onClick={resetFilters}
-          className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-white text-[13px] font-black uppercase tracking-widest shadow-[0_20px_40px_-10px_rgba(67,24,255,0.3)] hover:scale-[1.05] active:scale-[0.95] transition-all group"
-        >
-          <FilterX className="h-5 w-5 transition-transform group-hover:rotate-12" />
-          Limpiar Filtros
-        </button>
-      </div>
-
-      {/* Audit Chain Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8">
-        <AuditChainCard
-          title="A: Módulos"
-          items={filteredResources?.modules.map(m => ({ id: m.id_modulo!, nombre: m.nombre, codigo: m.codigo })) || []}
-          selectedId={selectedModuleId}
-          onSelect={(id) => {
-            if (selectedModuleId === id) {
-              setSelectedModuleId(undefined);
-            } else {
-              setSelectedModuleId(id);
-            }
-            setSelectedReqId(undefined);
-            setSelectedRiskId(undefined);
-            setSelectedControlId(undefined);
-          }}
-          onDoubleClick={handleDoubleClick}
-          isLoading={isLoading}
-        />
-        <AuditChainCard
-          title="B: Requerimientos"
-          items={filteredResources?.requirements.map(r => ({ id: r.id, nombre: r.nombre, codigo: r.codigo })) || []}
-          selectedId={selectedReqId}
-          onSelect={(id) => {
-            if (selectedReqId === id) {
-              setSelectedReqId(undefined);
-            } else {
-              setSelectedReqId(id);
-            }
-            setSelectedRiskId(undefined);
-            setSelectedControlId(undefined);
-          }}
-          onDoubleClick={handleDoubleClick}
-          isLoading={isLoading}
-        />
-        <AuditChainCard
-          title="C: Riesgos"
-          items={filteredResources?.risks.map(ri => ({ id: ri.id, nombre: ri.nombre, codigo: ri.codigo })) || []}
-          selectedId={selectedRiskId}
-          onSelect={(id) => {
-            if (selectedRiskId === id) {
-              setSelectedRiskId(undefined);
-            } else {
-              setSelectedRiskId(id);
-            }
-            setSelectedControlId(undefined);
-          }}
-          onDoubleClick={handleDoubleClick}
-          isLoading={isLoading}
-        />
-        <AuditChainCard
-          title="D: Controles"
-          items={filteredResources?.controls.map(c => ({ id: c.id, nombre: c.nombre, codigo: c.codigo })) || []}
-          selectedId={selectedControlId}
-          onSelect={(id) => {
-            if (selectedControlId === id) {
-              setSelectedControlId(undefined);
-            } else {
-              setSelectedControlId(id);
-            }
-          }}
-          onDoubleClick={handleDoubleClick}
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Empty State Illustration if no tests and filters active */}
-      {filteredResources && filteredResources.tests.length === 0 && (selectedModuleId || selectedReqId) && !isLoading && (
-        <div className="flex flex-col items-center justify-center py-20 animate-in fade-in zoom-in-95 duration-500">
-          <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center mb-6">
-            <SearchX className="h-10 w-10 text-muted-foreground opacity-30" />
+          {/* Views Rendering */}
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {currentView === 'summary' && (
+              <SummaryView
+                summary={data?.summary || null}
+                isLoading={isLoading}
+              />
+            )}
+            {currentView === 'risks' && (
+              <RisksView
+                data={data}
+                isLoading={isLoading}
+                selectedRiskIds={selectedRiskIds}
+                onRiskSelect={handleRiskSelect}
+                filteredControls={filteredControls}
+                filteredTests={filteredTests}
+              />
+            )}
+            {currentView === 'requirements' && (
+              <RequirementsView
+                requirements={data?.requirements || []}
+                isLoading={isLoading}
+              />
+            )}
+            {currentView === 'controls' && (
+              <ControlsView
+                controls={data?.controls || []}
+                isLoading={isLoading}
+              />
+            )}
+            {currentView === 'tests' && (
+              <TestsView
+                tests={data?.tests || []}
+                isLoading={isLoading}
+              />
+            )}
           </div>
-          <h2 className="text-xl font-black text-[#1B2559] dark:text-white uppercase tracking-tight mb-2">No se encontraron pruebas</h2>
-          <p className="text-[#A3AED0] text-sm font-bold uppercase tracking-widest italic">Ajusta los filtros para ver otros resultados</p>
-        </div>
-      )}
 
-      {/* Tests List Section */}
-      <AuditTestsList
-        tests={filteredResources?.tests || []}
-        isLoading={isLoading}
-      />
+        </div>
+      </div>
     </div>
   );
 }

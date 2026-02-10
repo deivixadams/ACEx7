@@ -48,15 +48,14 @@ const AuditChainCard: React.FC<AuditChainCardProps> = ({
 
     return (
         <div className="flex flex-col h-[460px] bg-[var(--card)] border border-[var(--card-border)] rounded-[12px] shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
-            {/* Header */}
-            <div className="px-6 py-5 border-b border-[var(--card-border)] flex flex-col gap-3 bg-[var(--background)]/30">
-                <h3 className="text-[13px] font-semibold uppercase tracking-[2px] text-slate-500 dark:text-slate-400 ml-1">{title}</h3>
+            <div className="px-6 py-5 border-b border-[var(--card-border)] flex items-center justify-between bg-[var(--background)]/30">
+                <h3 className="text-[14px] font-bold uppercase tracking-[2px] text-slate-500 dark:text-slate-400">{title}</h3>
 
-                <div className="flex items-center gap-4">
-                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-                        <Icon className="h-6 w-6" />
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-4xl font-light tracking-tight text-[var(--foreground)] leading-none">
+                    <span className="text-3xl font-light tracking-tight text-[var(--foreground)] leading-none">
                         {items.length}
                     </span>
                 </div>
