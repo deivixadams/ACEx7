@@ -1,11 +1,9 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
-  Rocket,
-  FilterX,
-  BookOpen
+  FilterX
 } from 'lucide-react';
 
 // Views
@@ -119,11 +117,6 @@ export default function Dashboard() {
     };
     fetchData();
   }, []);
-
-  const handleLaunchAudit = () => {
-    alert('Iniciando proceso de auditoría ACEx7...');
-  };
-
   const handleRiskSelect = (id: string, isMulti: boolean) => {
     if (isMulti) {
       setSelectedRiskIds(prev =>
@@ -194,19 +187,6 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors shadow-sm">
-                <BookOpen className="h-4 w-4" />
-                Guía
-              </button>
-
-              <button
-                onClick={handleLaunchAudit}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider shadow-md hover:bg-emerald-700 transition-all"
-              >
-                <Rocket className="h-4 w-4" />
-                Auditar
-              </button>
-
               {currentView === 'risks' && (
                 <button
                   onClick={resetSelection}
