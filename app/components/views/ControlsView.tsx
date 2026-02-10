@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useState } from 'react';
-import { BookOpen, CheckCircle2, FilterX, ListFilter, ShieldCheck, X } from 'lucide-react';
+import { BookOpen, FilterX, ListFilter, ShieldCheck, X } from 'lucide-react';
 
 interface ControlsViewProps {
     controls: any[];
@@ -39,7 +39,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
     const [isReviewLoading, setIsReviewLoading] = useState(false);
     const [reviewControls, setReviewControls] = useState<ReviewControl[]>([]);
     const [results, setResults] = useState<Record<string, string>>({});
-    const [validated, setValidated] = useState<Set<string>>(new Set());
+    const [compliance, setCompliance] = useState<Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''>>({});
 
     const selectedCount = selectedIds.size;
 
@@ -90,11 +90,20 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
         }
     };
 
-    const downloadWordFile = async (controlIds: string[], currentResults: Record<string, string>) => {
+    const downloadWordFile = async (
+        controlIds: string[],
+        currentResults: Record<string, string>,
+        currentCompliance: Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''>
+    ) => {
         const res = await fetch('/api/review-guides', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ controlIds, download: true, results: currentResults })
+            body: JSON.stringify({
+                controlIds,
+                download: true,
+                results: currentResults,
+                compliance: currentCompliance
+            })
         });
         if (!res.ok) return;
         const blob = await res.blob();
@@ -111,22 +120,14 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
         window.URL.revokeObjectURL(url);
     };
 
-    const handleValidate = (controlId: string) => {
-        setValidated((prev) => new Set(prev).add(controlId));
-    };
-
     const handleClearResult = (controlId: string) => {
         setResults((prev) => ({ ...prev, [controlId]: '' }));
-        setValidated((prev) => {
-            const next = new Set(prev);
-            next.delete(controlId);
-            return next;
-        });
+        setCompliance((prev) => ({ ...prev, [controlId]: '' }));
     };
 
     const handleEvaluate = async () => {
         if (reviewControls.length === 0) return;
-        await downloadWordFile(reviewControls.map((c) => c.id_control), results);
+        await downloadWordFile(reviewControls.map((c) => c.id_control), results, compliance);
     };
 
     if (isLoading) {
@@ -268,12 +269,12 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                                         {control.descripcion || '-'}
                                                     </div>
                                                 </div>
-                                                {validated.has(control.id_control) && (
-                                                    <span className="inline-flex items-center gap-2 text-xs font-bold uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full">
-                                                        <CheckCircle2 className="h-4 w-4" />
-                                                        Validado
-                                                    </span>
-                                                )}
+                                                <span className="text-xs text-slate-500 uppercase tracking-wider">
+                                                    {compliance[control.id_control] === 'cumple' && 'Cumple'}
+                                                    {compliance[control.id_control] === 'no_cumple' && 'No cumple'}
+                                                    {compliance[control.id_control] === 'parcial' && 'Cumple parcial'}
+                                                    {(!compliance[control.id_control] || compliance[control.id_control] === '') && 'Sin evaluar'}
+                                                </span>
                                             </div>
 
                                             <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -317,6 +318,35 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
 
                                             <div className="mt-4">
                                                 <label className="text-xs font-bold uppercase text-slate-600">Resultado de evaluacion (max 2000 caracteres)</label>
+                                                <div className="mt-3 flex flex-wrap items-center gap-4">
+                                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={compliance[control.id_control] === 'cumple'}
+                                                            onChange={() => setCompliance((prev) => ({ ...prev, [control.id_control]: prev[control.id_control] === 'cumple' ? '' : 'cumple' }))}
+                                                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                                        />
+                                                        Cumple
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={compliance[control.id_control] === 'no_cumple'}
+                                                            onChange={() => setCompliance((prev) => ({ ...prev, [control.id_control]: prev[control.id_control] === 'no_cumple' ? '' : 'no_cumple' }))}
+                                                            className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                                                        />
+                                                        No cumple
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={compliance[control.id_control] === 'parcial'}
+                                                            onChange={() => setCompliance((prev) => ({ ...prev, [control.id_control]: prev[control.id_control] === 'parcial' ? '' : 'parcial' }))}
+                                                            className="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                                                        />
+                                                        Cumple parcial
+                                                    </label>
+                                                </div>
                                                 <textarea
                                                     maxLength={2000}
                                                     rows={4}
@@ -327,12 +357,6 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                             </div>
 
                                             <div className="mt-4 flex items-center gap-3">
-                                                <button
-                                                    onClick={() => handleValidate(control.id_control)}
-                                                    className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-emerald-700"
-                                                >
-                                                    Validar
-                                                </button>
                                                 <button
                                                     onClick={() => handleClearResult(control.id_control)}
                                                     className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wider hover:bg-slate-300"

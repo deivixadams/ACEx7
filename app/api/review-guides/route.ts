@@ -6,6 +6,7 @@ type ReviewRequest = {
   controlIds?: string[];
   download?: boolean;
   results?: Record<string, string>;
+  compliance?: Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''>;
 };
 
 type ControlRow = {
@@ -44,7 +45,11 @@ function ddmmyyyy(date: Date) {
   return `${dd}${mm}${yyyy}`;
 }
 
-function buildDocx(controls: any[], results: Record<string, string> | undefined) {
+function buildDocx(
+  controls: any[],
+  results: Record<string, string> | undefined,
+  compliance: Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''> | undefined
+) {
   const now = new Date();
   const children: Paragraph[] = [];
 
@@ -146,10 +151,25 @@ function buildDocx(controls: any[], results: Record<string, string> | undefined)
     }
 
     const resultText = results?.[control.id_control] || '';
+    const complianceValue = compliance?.[control.id_control] || '';
+    const complianceLabel =
+      complianceValue === 'cumple'
+        ? 'Cumple'
+        : complianceValue === 'no_cumple'
+        ? 'No cumple'
+        : complianceValue === 'parcial'
+        ? 'Cumple parcial'
+        : 'Sin evaluar';
     children.push(
       new Paragraph({
         text: 'Resultado de evaluacion (max 2000 caracteres):',
         spacing: { before: 120, after: 40 },
+      })
+    );
+    children.push(
+      new Paragraph({
+        text: `Estado: ${complianceLabel}`,
+        spacing: { after: 40 },
       })
     );
     children.push(
@@ -222,7 +242,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ controls });
   }
 
-  const doc = buildDocx(controls, body.results);
+  const doc = buildDocx(controls, body.results, body.compliance);
   const buffer = await Packer.toBuffer(doc);
   const filename = `Cumplimiento-${ddmmyyyy(new Date())}.docx`;
 
