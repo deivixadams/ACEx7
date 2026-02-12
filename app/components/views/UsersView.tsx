@@ -303,9 +303,9 @@ const UsersView = () => {
             {/* Modal Form */}
             {showForm && (
                 <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-white/20 animate-in zoom-in-95 duration-500">
-                        {/* Side Banner */}
-                        <div className="hidden lg:flex w-1/3 bg-slate-950 p-12 text-white flex-col justify-between relative overflow-hidden">
+                    <div className="bg-white rounded-[3rem] w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-white/20 animate-in zoom-in-95 duration-500">
+                        {/* Side Banner - Lightened */}
+                        <div className="hidden lg:flex w-1/4 bg-slate-800 p-12 text-white flex-col justify-between relative overflow-hidden">
                             <div className="relative z-10 space-y-6">
                                 <div className="w-16 h-16 bg-primary/20 rounded-3xl flex items-center justify-center text-primary border border-primary/20">
                                     <Lock className="h-8 w-8" />
@@ -313,7 +313,7 @@ const UsersView = () => {
                                 <h3 className="text-3xl font-black leading-tight tracking-tight">
                                     {editingUser ? 'Actualizar Privilegios' : 'Alta de Nuevo Ejecutivo'}
                                 </h3>
-                                <p className="text-slate-400 text-sm font-medium leading-relaxed italic">
+                                <p className="text-slate-300 text-sm font-medium leading-relaxed italic">
                                     "La seguridad de ACE-X7 comienza con la integridad de sus identidades digitales."
                                 </p>
                             </div>
@@ -323,7 +323,7 @@ const UsersView = () => {
                                         <Check className="h-5 w-5 bg-primary/10 rounded-full p-1 border border-primary/20" />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Hashing de Clase Mundial</span>
                                     </div>
-                                    <div className="flex items-center gap-3 text-emerald-500">
+                                    <div className="flex items-center gap-3 text-emerald-400">
                                         <Check className="h-5 w-5 bg-emerald-500/10 rounded-full p-1 border border-emerald-500/20" />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Identidad Verificada</span>
                                     </div>
@@ -332,14 +332,14 @@ const UsersView = () => {
                             <Shield className="absolute -left-20 -bottom-20 h-64 w-64 text-white/5 -rotate-12" />
                         </div>
 
-                        {/* Form Body */}
-                        <div className="flex-1 p-8 lg:p-12 overflow-y-auto scrollbar-hide">
+                        {/* Form Body - More spaced */}
+                        <div className="flex-1 p-8 lg:p-14 overflow-y-auto scrollbar-hide">
                             <button onClick={resetForm} className="absolute top-8 right-8 p-3 hover:bg-slate-100 rounded-2xl text-slate-400 group transition-all">
                                 <X className="h-6 w-6 group-hover:rotate-90 transition-transform" />
                             </button>
 
-                            <form onSubmit={handleSubmit} className="space-y-8">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <form onSubmit={handleSubmit} className="space-y-10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                     <FormInput
                                         label="Nombre Profesional"
                                         icon={<User className="h-4 w-4" />}
@@ -348,12 +348,13 @@ const UsersView = () => {
                                         placeholder="Ej. Alexander Pierce"
                                     />
                                     <FormInput
-                                        label="Business Email (Username)"
+                                        label="Business Email (Username) *"
                                         icon={<Mail className="h-4 w-4" />}
                                         value={formData.email}
                                         onChange={(v: string) => setFormData({ ...formData, email: v })}
                                         placeholder="a.pierce@corporate.com"
                                         type="email"
+                                        required={true}
                                     />
                                     <FormInput
                                         label="Posición / Cargo"
@@ -377,11 +378,12 @@ const UsersView = () => {
                                     value={formData.direccion}
                                     onChange={(v: string) => setFormData({ ...formData, direccion: v })}
                                     placeholder="Avenida Principal #12-34, Bogota"
+                                    required={false}
                                 />
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jerarquía de Seguridad</label>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jerarquía de Seguridad *</label>
                                         <select
                                             value={formData.id_rol}
                                             onChange={e => setFormData({ ...formData, id_rol: parseInt(e.target.value) })}
@@ -404,10 +406,10 @@ const UsersView = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 pt-6 bg-slate-50 p-8 rounded-[2rem] border border-slate-100 relative overflow-hidden">
+                                <div className="space-y-4 pt-6 bg-slate-50 p-10 rounded-[2rem] border border-slate-100 relative overflow-hidden">
                                     <div className="flex items-center justify-between relative z-10">
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seguridad de Acceso</span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seguridad de Acceso *</span>
                                             <p className="text-xs font-bold text-slate-600">Configurar contraseña cifrada con hashing PBKDF2</p>
                                         </div>
                                         <button
@@ -425,6 +427,7 @@ const UsersView = () => {
                                         </div>
                                         <input
                                             type={showPassword ? "text" : "password"}
+                                            required={!editingUser}
                                             value={formData.password}
                                             onChange={e => setFormData({ ...formData, password: e.target.value })}
                                             placeholder={editingUser ? "Dejar en blanco para conservar actual" : "Establecer contraseña maestra"}
@@ -450,7 +453,7 @@ const UsersView = () => {
     );
 };
 
-const FormInput = ({ label, icon, value, onChange, placeholder, type = "text" }: any) => (
+const FormInput = ({ label, icon, value, onChange, placeholder, type = "text", required = false }: any) => (
     <div className="space-y-2">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
         <div className="relative">
@@ -459,7 +462,7 @@ const FormInput = ({ label, icon, value, onChange, placeholder, type = "text" }:
             </div>
             <input
                 type={type}
-                required={type !== 'password'}
+                required={required}
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}

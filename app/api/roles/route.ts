@@ -12,3 +12,16 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch roles' }, { status: 500 });
     }
 }
+export async function POST(request: Request) {
+    try {
+        const { nombre, descripcion, activo } = await request.json();
+        const result = await pool.query(
+            'INSERT INTO roles (nombre, descripcion, activo) VALUES ($1, $2, $3) RETURNING id_rol as id',
+            [nombre, descripcion, activo ?? true]
+        );
+        return NextResponse.json(result.rows[0]);
+    } catch (error: any) {
+        console.error('Roles API POST Error:', error);
+        return NextResponse.json({ error: 'Failed to create role' }, { status: 500 });
+    }
+}
