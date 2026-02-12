@@ -3,7 +3,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
-  FilterX
+  FilterX,
+  Building,
+  Users,
+  Lock,
+  Library,
+  Save
 } from 'lucide-react';
 
 // Views
@@ -67,7 +72,7 @@ interface AuditData {
   summary?: any;
 }
 
-type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary';
+type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary' | 'company' | 'users' | 'roles' | 'library' | 'backup';
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
@@ -181,7 +186,12 @@ export default function Dashboard() {
                   {currentView === 'risks' ? 'Risk View' :
                     currentView === 'requirements' ? 'Reqs View' :
                       currentView === 'controls' ? 'Controls View' :
-                        currentView === 'tests' ? 'Tests View' : 'Resumen'}
+                        currentView === 'tests' ? 'Tests View' :
+                          currentView === 'company' ? 'Gestión: Empresa' :
+                            currentView === 'users' ? 'Gestión: Usuarios' :
+                              currentView === 'roles' ? 'Gestión: Roles' :
+                                currentView === 'library' ? 'Gestión: Biblioteca' :
+                                  currentView === 'backup' ? 'Gestión: Respaldo' : 'Resumen'}
                 </span>
               </h1>
             </div>
@@ -240,6 +250,72 @@ export default function Dashboard() {
                 tests={data?.tests || []}
                 isLoading={isLoading}
               />
+            )}
+
+            {/* Management Placeholders */}
+            {currentView === 'company' && (
+              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                  <Building className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">Gestión de Empresa</h2>
+                <p className="text-slate-500 max-w-md mx-auto">Configuración de perfiles, sedes y datos generales de la organización auditada.</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'users' && (
+              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                  <Users className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">Gestión de Usuarios</h2>
+                <p className="text-slate-500 max-w-md mx-auto">Administración de accesos, perfiles de auditores y control de sesiones.</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'roles' && (
+              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                  <Lock className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">Gestión de Roles</h2>
+                <p className="text-slate-500 max-w-md mx-auto">Definición de permisos y niveles de acceso a la plataforma ACE-X7.</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'library' && (
+              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                  <Library className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">Biblioteca Normativa</h2>
+                <p className="text-slate-500 max-w-md mx-auto">Repositorio centralizado de leyes, regulaciones y guías técnicas.</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'backup' && (
+              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                  <Save className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">Respaldo de Datos</h2>
+                <p className="text-slate-500 max-w-md mx-auto">Gestión de copias de seguridad y exportación de la base de datos de cumplimiento.</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
+                </div>
+              </div>
             )}
           </div>
 

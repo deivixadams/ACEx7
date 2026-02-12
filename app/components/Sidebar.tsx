@@ -1,16 +1,23 @@
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
-    BarChart3,
-    BookOpen,
-    ShieldAlert,
-    Settings,
     LayoutDashboard,
     FileCheck,
     Map,
-    Database
+    Database,
+    Building,
+    Users,
+    Lock,
+    Library,
+    Save,
+    ChevronDown,
+    ChevronRight,
+    ShieldAlert,
+    BarChart3,
+    Settings
 } from 'lucide-react';
 
 import { useSidebar } from '../context/SidebarContext';
@@ -27,9 +34,26 @@ const Sidebar = () => {
         { icon: FileCheck, label: 'Requerimientos', href: '/?view=requirements', id: 'requirements' },
         { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
         { icon: Settings, label: 'Pruebas', href: '/?view=tests', id: 'tests' },
-
-        { icon: Map, label: 'Gestión', href: '/territories', id: 'territories' },
+        {
+            icon: Map,
+            label: 'Gestión',
+            href: '#',
+            id: 'management',
+            subItems: [
+                { icon: Building, label: 'Empresa', href: '/?view=company', id: 'company' },
+                { icon: Users, label: 'Usuarios', href: '/?view=users', id: 'users' },
+                { icon: Lock, label: 'Roles', href: '/?view=roles', id: 'roles' },
+                { icon: Library, label: 'Biblioteca', href: '/?view=library', id: 'library' },
+                { icon: Save, label: 'Respaldo', href: '/?view=backup', id: 'backup' },
+            ]
+        },
     ];
+
+    const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({ management: true });
+
+    const toggleSubMenu = (id: string) => {
+        setOpenSubMenus(prev => ({ ...prev, [id]: !prev[id] }));
+    };
 
     return (
         <aside className={`w-64 bg-[var(--sidebar-bg)] h-screen flex flex-col fixed left-0 top-0 border-r border-[var(--header-border)] z-50 transition-all duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -46,6 +70,50 @@ const Sidebar = () => {
 
                 <nav className="space-y-2">
                     {menuItems.map((item) => {
+                        if (item.subItems) {
+                            const isSubActive = item.subItems.some(sub => currentView === sub.id);
+                            const isOpen = openSubMenus[item.id];
+
+                            return (
+                                <div key={item.id} className="space-y-1">
+                                    <button
+                                        onClick={() => toggleSubMenu(item.id)}
+                                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all group ${isSubActive
+                                            ? 'bg-slate-800 text-white shadow-lg'
+                                            : 'text-[#64748b] hover:bg-[var(--muted)] hover:text-[var(--foreground)] dark:text-[#94a3b8]'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <item.icon className="h-5 w-5" />
+                                            <span className="text-[15px] font-medium tracking-tight">{item.label}</span>
+                                        </div>
+                                        {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                    </button>
+
+                                    {isOpen && (
+                                        <div className="pl-4 space-y-1 mt-1 animate-in slide-in-from-top-1 duration-200">
+                                            {item.subItems.map((sub) => {
+                                                const isSubItemActive = currentView === sub.id;
+                                                return (
+                                                    <Link
+                                                        key={sub.id}
+                                                        href={sub.href}
+                                                        className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all ${isSubItemActive
+                                                            ? 'bg-primary/10 text-primary font-bold'
+                                                            : 'text-[#64748b] hover:bg-[var(--muted)] hover:text-[var(--foreground)]'
+                                                            }`}
+                                                    >
+                                                        <sub.icon className="h-4 w-4" />
+                                                        <span className="text-[13px]">{sub.label}</span>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
                         // Determine active state
                         let isActive = false;
                         if (item.href.startsWith('/?view=')) {
