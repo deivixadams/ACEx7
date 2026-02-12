@@ -5,16 +5,18 @@ import { llmStudioChat } from '@/lib/llm/llmstudio';
 
 type ReviewRequest = {
   controlIds?: string[];
-  download?: boolean;
+  requirementIds?: string[];
   results?: Record<string, string>;
-  compliance?: Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''>;
-};
+  compliance?: Record<string, string>;
+  download?: boolean;
+  isRequirement?: boolean;
+}
 
 type ControlRow = {
   id_control: string;
   nombre: string;
   descripcion: string | null;
-  criticidad: number | null;
+  criticidad?: number | null;
   criticidad_etiqueta: string | null;
 };
 
@@ -42,7 +44,7 @@ type TestRow = {
 };
 
 async function writeControlLog(params: {
-  controlIds: string[];
+  targetIds: string[];
   stage: string;
   status: 'start' | 'ok' | 'error';
   message?: string;
@@ -54,7 +56,7 @@ async function writeControlLog(params: {
       `insert into control_log (control_ids, stage, status, message, duration_ms, metadata)
        values ($1, $2, $3, $4, $5, $6)`,
       [
-        params.controlIds.join(','),
+        params.targetIds.join(','),
         params.stage,
         params.status,
         params.message || null,
@@ -67,16 +69,18 @@ async function writeControlLog(params: {
   }
 }
 
-function ddmmyyyy(date: Date) {
+function formatNomenclature(date: Date, prefix: string) {
+  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const MMM = months[date.getMonth()];
   const dd = String(date.getDate()).padStart(2, '0');
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const yyyy = String(date.getFullYear());
-  return `${dd}${mm}${yyyy}`;
+  const HH = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${prefix}-${MMM}${dd}-${HH}${mm}`;
 }
 
 function computeMaturity(
   controls: any[],
-  compliance: Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''> | undefined
+  compliance: Record<string, string> | undefined
 ) {
   const total = controls.length;
   if (total === 0) return { ic: 0, score: 1, gatingReason: '' };
@@ -92,26 +96,32 @@ function computeMaturity(
     if (state === 'no_cumple') {
       sum += 0.0;
       noCumpleCount += 1;
-      if (c.criticidad === 2) hasCriticalNoCumple = true;
+      const isHighRisk = c.criticidad === 2 || c.criticidad_etiqueta?.toLowerCase().includes('alto') || c.criticidad_etiqueta?.toLowerCase().includes('crítico');
+      if (isHighRisk) hasCriticalNoCumple = true;
     }
     if (state === '') sum += 0.0;
   });
 
   const ic = sum / total;
 
-  if (noCumpleCount / total > 0.3) {
-    return { ic, score: 1, gatingReason: 'Mas del 30% No cumple' };
-  }
-
+  // Scoring rules based on updated thresholds
   let score = 1;
-  if (ic >= 0.9) score = 5;
-  else if (ic >= 0.75) score = 4;
+  if (ic >= 0.95) score = 5;
+  else if (ic >= 0.8) score = 4;
   else if (ic >= 0.6) score = 3;
   else if (ic >= 0.4) score = 2;
   else score = 1;
 
+  // Gating Rules
+  if (noCumpleCount === total) {
+    return { ic, score: 1, gatingReason: 'Incumplimiento total (100%)' };
+  }
+  if (noCumpleCount / total > 0.3) {
+    return { ic, score: 1, gatingReason: `Alto nivel de incumplimiento (${Math.round((noCumpleCount / total) * 100)}%)` };
+  }
+
   if (hasCriticalNoCumple && score > 2) {
-    return { ic, score: 2, gatingReason: 'No cumple en control critico' };
+    return { ic, score: 2, gatingReason: 'No cumple en control crítico' };
   }
 
   return { ic, score, gatingReason: '' };
@@ -144,17 +154,17 @@ async function generateConclusion(params: {
 
   try {
     const supportsSystemRole = process.env.LLM_SYSTEM_ROLE !== 'false';
-    const messages = supportsSystemRole
+    const messages: any[] = supportsSystemRole
       ? [
-          { role: 'system', content: system },
-          { role: 'user', content: `Datos para la conclusión:\n${user}` },
-        ]
+        { role: 'system', content: system },
+        { role: 'user', content: `Datos para la conclusión:\n${user}` },
+      ]
       : [
-          {
-            role: 'user',
-            content: `${system}\n\nDatos para la conclusión:\n${user}`,
-          },
-        ];
+        {
+          role: 'user',
+          content: `${system}\n\nDatos para la conclusión:\n${user}`,
+        },
+      ];
 
     const r = await llmStudioChat({
       model,
@@ -177,7 +187,7 @@ async function generateConclusion(params: {
 function buildDocx(
   controls: any[],
   results: Record<string, string> | undefined,
-  compliance: Record<string, 'cumple' | 'no_cumple' | 'parcial' | ''> | undefined,
+  compliance: Record<string, string> | undefined,
   conclusion: string
 ) {
   const now = new Date();
@@ -286,10 +296,10 @@ function buildDocx(
       complianceValue === 'cumple'
         ? 'Cumple'
         : complianceValue === 'no_cumple'
-        ? 'No cumple'
-        : complianceValue === 'parcial'
-        ? 'Cumple parcial'
-        : 'Sin evaluar';
+          ? 'No cumple'
+          : complianceValue === 'parcial'
+            ? 'Cumple parcial'
+            : 'Sin evaluar';
     children.push(
       new Paragraph({
         text: 'Resultado de evaluacion (max 2000 caracteres):',
@@ -353,39 +363,54 @@ function buildDocx(
 export async function POST(request: Request) {
   const body = (await request.json()) as ReviewRequest;
   const controlIds = Array.isArray(body.controlIds) ? body.controlIds : [];
-  if (controlIds.length === 0) {
-    return NextResponse.json({ error: 'controlIds required' }, { status: 400 });
+  const requirementIds = Array.isArray(body.requirementIds) ? body.requirementIds : [];
+
+  const isReq = requirementIds.length > 0;
+  const targetIds = isReq ? requirementIds : controlIds;
+
+  if (targetIds.length === 0) {
+    return NextResponse.json({ error: 'controlIds or requirementIds required' }, { status: 400 });
   }
 
   await writeControlLog({
-    controlIds,
+    targetIds,
     stage: 'request',
     status: 'start',
-    message: 'review-guides request started',
+    message: `review-guides request started for ${isReq ? 'requirements' : 'controls'}`,
   });
 
-  const controlsQuery = `
-    SELECT c.id_control, c.nombre, c.descripcion, c.criticidad, cc.etiqueta as criticidad_etiqueta
-    FROM controls c
-    LEFT JOIN Criticidad_Control cc ON cc.valor = c.criticidad
-    WHERE c.id_control = ANY($1)
-    ORDER BY nombre ASC
-  `;
-  const risksQuery = `
-    SELECT rc.id_control, r.id_riesgo, r.descripcion, r.tipo, r.impacto, r.probabilidad, r.nivel_riesgo
-    FROM risk_controls_link rc
-    JOIN risk_by_req r ON r.id_riesgo = rc.id_riesgo
-    WHERE rc.id_control = ANY($1)
-  `;
-  const testsQuery = `
-    SELECT tcm.id_control, t.id_prueba, t.nombre, t.codigo_prueba, t.descripcion,
-           td.como_hacer_la_prueba, td.evidencia_minima, td.fuente_evidencia,
-           td.criterio_aceptacion, td.muestreo_sugerido
-    FROM test_control_map tcm
-    JOIN test_all t ON t.id_prueba = tcm.id_prueba
-    LEFT JOIN test_detalle td ON td.id_prueba = t.id_prueba
-    WHERE tcm.id_control = ANY($1)
-  `;
+  const entityQuery = isReq
+    ? `SELECT id_requerimiento as id_control, titulo as nombre, descripcion, nivel_riesgo as criticidad_etiqueta 
+       FROM requirements WHERE id_requerimiento = ANY($1) ORDER BY codigo ASC`
+    : `SELECT c.id_control, c.nombre, c.descripcion, c.criticidad, cc.etiqueta as criticidad_etiqueta
+       FROM controls c
+       LEFT JOIN Criticidad_Control cc ON cc.valor = c.criticidad
+       WHERE c.id_control = ANY($1)
+       ORDER BY nombre ASC`;
+
+  const risksQuery = isReq
+    ? `SELECT id_requerimiento as id_control, id_riesgo, descripcion, tipo, impacto, probabilidad, nivel_riesgo
+       FROM risk_by_req WHERE id_requerimiento = ANY($1)`
+    : `SELECT rc.id_control, r.id_riesgo, r.descripcion, r.tipo, r.impacto, r.probabilidad, r.nivel_riesgo
+       FROM risk_controls_link rc
+       JOIN risk_by_req r ON r.id_riesgo = rc.id_riesgo
+       WHERE rc.id_control = ANY($1)`;
+
+  const testsQuery = isReq
+    ? `SELECT trm.requerimiento_id as id_control, t.id_prueba, t.nombre, t.codigo_prueba, t.descripcion,
+              td.como_hacer_la_prueba, td.evidencia_minima, td.fuente_evidencia,
+              td.criterio_aceptacion, td.muestreo_sugerido
+       FROM test_req_map trm
+       JOIN test_all t ON t.id_prueba = trm.prueba_id
+       LEFT JOIN test_detalle td ON td.id_prueba = t.id_prueba
+       WHERE trm.requerimiento_id = ANY($1)`
+    : `SELECT tcm.id_control, t.id_prueba, t.nombre, t.codigo_prueba, t.descripcion,
+              td.como_hacer_la_prueba, td.evidencia_minima, td.fuente_evidencia,
+              td.criterio_aceptacion, td.muestreo_sugerido
+       FROM test_control_map tcm
+       JOIN test_all t ON t.id_prueba = tcm.id_prueba
+       LEFT JOIN test_detalle td ON td.id_prueba = t.id_prueba
+       WHERE tcm.id_control = ANY($1)`;
 
   const dataStart = Date.now();
   let controlsRes;
@@ -393,12 +418,12 @@ export async function POST(request: Request) {
   let testsRes;
   try {
     [controlsRes, risksRes, testsRes] = await Promise.all([
-      pool.query<ControlRow>(controlsQuery, [controlIds]),
-      pool.query<RiskRow>(risksQuery, [controlIds]),
-      pool.query<TestRow>(testsQuery, [controlIds]),
+      pool.query<ControlRow>(entityQuery, [targetIds]),
+      pool.query<RiskRow>(risksQuery, [targetIds]),
+      pool.query<TestRow>(testsQuery, [targetIds]),
     ]);
     await writeControlLog({
-      controlIds,
+      targetIds,
       stage: 'data',
       status: 'ok',
       durationMs: Date.now() - dataStart,
@@ -410,7 +435,7 @@ export async function POST(request: Request) {
     });
   } catch (err: any) {
     await writeControlLog({
-      controlIds,
+      targetIds,
       stage: 'data',
       status: 'error',
       durationMs: Date.now() - dataStart,
@@ -441,7 +466,7 @@ export async function POST(request: Request) {
 
   if (!body.download) {
     await writeControlLog({
-      controlIds,
+      targetIds,
       stage: 'response',
       status: 'ok',
       message: 'review data returned',
@@ -470,7 +495,7 @@ export async function POST(request: Request) {
     counts,
   });
   await writeControlLog({
-    controlIds,
+    targetIds,
     stage: 'llm',
     status: 'ok',
     durationMs: Date.now() - llmStart,
@@ -480,21 +505,21 @@ export async function POST(request: Request) {
   const doc = buildDocx(controls, body.results, body.compliance, conclusion);
   const buffer = await Packer.toBuffer(doc);
   await writeControlLog({
-    controlIds,
+    targetIds,
     stage: 'docx',
     status: 'ok',
     durationMs: Date.now() - docStart,
   });
-  const filename = `Cumplimiento-${ddmmyyyy(new Date())}.docx`;
+  const filename = `${formatNomenclature(new Date(), isReq ? 'Requerimiento' : 'Cumplimiento')}.docx`;
 
   await writeControlLog({
-    controlIds,
+    targetIds,
     stage: 'response',
     status: 'ok',
     message: 'docx generated',
   });
 
-  return new NextResponse(buffer, {
+  return new NextResponse(buffer as any, {
     status: 200,
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

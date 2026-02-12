@@ -77,6 +77,9 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
         }
         setIsReviewOpen(true);
         setIsReviewLoading(true);
+        // Reset evaluation state for the new session
+        setResults({});
+        setCompliance({});
         try {
             const res = await fetch('/api/review-guides', {
                 method: 'POST',
@@ -154,19 +157,24 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
 
         const ic = sum / total;
 
-        if (noCumpleCount / total > 0.3) {
-            return { ic, score: 1, gatingReason: 'Mas del 30% No cumple' };
-        }
-
+        // Scoring rules based on updated thresholds
         let score = 1;
-        if (ic >= 0.9) score = 5;
-        else if (ic >= 0.75) score = 4;
+        if (ic >= 0.95) score = 5;
+        else if (ic >= 0.8) score = 4;
         else if (ic >= 0.6) score = 3;
         else if (ic >= 0.4) score = 2;
         else score = 1;
 
+        // Gating Rules
+        if (noCumpleCount === total) {
+            return { ic, score: 1, gatingReason: 'Incumplimiento total (100%)' };
+        }
+        if (noCumpleCount / total > 0.3) {
+            return { ic, score: 1, gatingReason: `Alto nivel de incumplimiento (${Math.round((noCumpleCount / total) * 100)}%)` };
+        }
+
         if (hasCriticalNoCumple && score > 2) {
-            return { ic, score: 2, gatingReason: 'No cumple en control critico' };
+            return { ic, score: 2, gatingReason: 'No cumple en control crítico' };
         }
 
         return { ic, score, gatingReason: '' };
@@ -206,11 +214,10 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                     <button
                         onClick={clearSelection}
                         disabled={selectedCount === 0}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm ${
-                            selectedCount > 0
-                                ? 'bg-slate-700 text-white hover:bg-slate-800'
-                                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                        }`}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm ${selectedCount > 0
+                            ? 'bg-slate-700 text-white hover:bg-slate-800'
+                            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                            }`}
                     >
                         <FilterX className="h-4 w-4" />
                         Limpiar selección
@@ -308,13 +315,12 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                                 <div>
                                                     <div className="flex items-center gap-3">
                                                         <div className="text-lg font-bold text-slate-800">{control.nombre}</div>
-                                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${
-                                                            control.criticidad === 2
-                                                                ? 'bg-rose-50 text-rose-700 border-rose-200'
-                                                                : control.criticidad === 1
+                                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${control.criticidad === 2
+                                                            ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                                            : control.criticidad === 1
                                                                 ? 'bg-amber-50 text-amber-700 border-amber-200'
                                                                 : 'bg-slate-100 text-slate-600 border-slate-200'
-                                                        }`}>
+                                                            }`}>
                                                             {control.criticidad_etiqueta || 'Normal'}
                                                         </span>
                                                     </div>
@@ -372,30 +378,30 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                             <div className="mt-4">
                                                 <label className="text-xs font-bold uppercase text-slate-600">Resultado de evaluación (max 2000 caracteres)</label>
                                                 <div className="mt-3 flex flex-wrap items-center gap-4">
-                                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                    <label className="flex items-center gap-2 text-xs font-bold text-emerald-800">
                                                         <input
                                                             type="checkbox"
                                                             checked={compliance[control.id_control] === 'cumple'}
                                                             onChange={() => setCompliance((prev) => ({ ...prev, [control.id_control]: prev[control.id_control] === 'cumple' ? '' : 'cumple' }))}
-                                                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                                            className="h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500"
                                                         />
                                                         Cumple
                                                     </label>
-                                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                    <label className="flex items-center gap-2 text-xs font-bold text-rose-800">
                                                         <input
                                                             type="checkbox"
                                                             checked={compliance[control.id_control] === 'no_cumple'}
                                                             onChange={() => setCompliance((prev) => ({ ...prev, [control.id_control]: prev[control.id_control] === 'no_cumple' ? '' : 'no_cumple' }))}
-                                                            className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                                                            className="h-4 w-4 rounded border-rose-300 text-rose-600 focus:ring-rose-500"
                                                         />
                                                         No cumple
                                                     </label>
-                                                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                    <label className="flex items-center gap-2 text-xs font-bold text-amber-800">
                                                         <input
                                                             type="checkbox"
                                                             checked={compliance[control.id_control] === 'parcial'}
                                                             onChange={() => setCompliance((prev) => ({ ...prev, [control.id_control]: prev[control.id_control] === 'parcial' ? '' : 'parcial' }))}
-                                                            className="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                                                            className="h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
                                                         />
                                                         Cumple parcial
                                                     </label>
@@ -403,7 +409,8 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                                 <textarea
                                                     maxLength={2000}
                                                     rows={4}
-                                                    className="mt-2 w-full rounded-lg border border-slate-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                    className="mt-2 w-full rounded-lg border border-emerald-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-emerald-50/30"
+                                                    placeholder="Escribe el resultado de la prueba aquí..."
                                                     value={results[control.id_control] || ''}
                                                     onChange={(e) => setResults((prev) => ({ ...prev, [control.id_control]: e.target.value }))}
                                                 />
@@ -435,18 +442,20 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                     </span>
                                 )}
                             </div>
-                            <button
-                                onClick={handleEvaluate}
-                                className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-emerald-700"
-                            >
-                                Evaluar
-                            </button>
-                            <button
-                                onClick={closeReview}
-                                className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wider hover:bg-slate-300"
-                            >
-                                Cerrar
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={handleEvaluate}
+                                    className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-emerald-700"
+                                >
+                                    Evaluar
+                                </button>
+                                <button
+                                    onClick={closeReview}
+                                    className="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wider hover:bg-slate-300"
+                                >
+                                    Cerrar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
