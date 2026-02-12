@@ -18,6 +18,8 @@ import ControlsView from './components/views/ControlsView';
 import TestsView from './components/views/TestsView';
 import SummaryView from './components/views/SummaryView';
 import CompanyView from './components/views/CompanyView';
+import UsersView from './components/views/UsersView';
+import RolesView from './components/views/RolesView';
 
 interface AuditItem {
   id: string;
@@ -259,29 +261,11 @@ export default function Dashboard() {
             )}
 
             {currentView === 'users' && (
-              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                  <Users className="h-8 w-8" />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-800">Gestión de Usuarios</h2>
-                <p className="text-slate-500 max-w-md mx-auto">Administración de accesos, perfiles de auditores y control de sesiones.</p>
-                <div className="pt-4">
-                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
-                </div>
-              </div>
+              <UsersView />
             )}
 
             {currentView === 'roles' && (
-              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                  <Lock className="h-8 w-8" />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-800">Gestión de Roles</h2>
-                <p className="text-slate-500 max-w-md mx-auto">Definición de permisos y niveles de acceso a la plataforma ACE-X7.</p>
-                <div className="pt-4">
-                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
-                </div>
-              </div>
+              <RolesView />
             )}
 
             {currentView === 'library' && (
