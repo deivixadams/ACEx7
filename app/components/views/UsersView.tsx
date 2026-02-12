@@ -303,14 +303,14 @@ const UsersView = () => {
             {/* Modal Form */}
             {showForm && (
                 <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[3rem] w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-white/20 animate-in zoom-in-95 duration-500">
+                    <div className="bg-white rounded-[3rem] w-full max-w-[1400px] max-h-[95vh] overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-white/20 animate-in zoom-in-95 duration-500">
                         {/* Side Banner - Lightened */}
                         <div className="hidden lg:flex w-1/4 bg-slate-800 p-12 text-white flex-col justify-between relative overflow-hidden">
                             <div className="relative z-10 space-y-6">
                                 <div className="w-16 h-16 bg-primary/20 rounded-3xl flex items-center justify-center text-primary border border-primary/20">
                                     <Lock className="h-8 w-8" />
                                 </div>
-                                <h3 className="text-3xl font-black leading-tight tracking-tight">
+                                <h3 className="text-4xl font-black leading-tight tracking-tight">
                                     {editingUser ? 'Actualizar Privilegios' : 'Alta de Nuevo Ejecutivo'}
                                 </h3>
                                 <p className="text-slate-300 text-sm font-medium leading-relaxed italic">
@@ -332,14 +332,14 @@ const UsersView = () => {
                             <Shield className="absolute -left-20 -bottom-20 h-64 w-64 text-white/5 -rotate-12" />
                         </div>
 
-                        {/* Form Body - More spaced */}
-                        <div className="flex-1 p-8 lg:p-14 overflow-y-auto scrollbar-hide">
-                            <button onClick={resetForm} className="absolute top-8 right-8 p-3 hover:bg-slate-100 rounded-2xl text-slate-400 group transition-all">
-                                <X className="h-6 w-6 group-hover:rotate-90 transition-transform" />
+                        {/* Form Body - Full scale and no scrollbar */}
+                        <div className="flex-1 p-10 lg:p-16 relative">
+                            <button onClick={resetForm} className="absolute top-10 right-10 p-3 hover:bg-slate-100 rounded-2xl text-slate-400 group transition-all z-30">
+                                <X className="h-7 w-7 group-hover:rotate-90 transition-transform" />
                             </button>
 
-                            <form onSubmit={handleSubmit} className="space-y-10">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <form onSubmit={handleSubmit} className="space-y-12">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                     <FormInput
                                         label="Nombre Profesional"
                                         icon={<User className="h-4 w-4" />}
