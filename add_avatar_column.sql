@@ -1,0 +1,2 @@
+-- Migration: Add avatar_url to usuarios
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS avatar_url TEXT;

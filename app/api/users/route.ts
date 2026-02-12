@@ -22,6 +22,7 @@ export async function GET() {
                 u.telefono,
                 u.direccion,
                 u.activo,
+                u.avatar_url,
                 r.id_rol,
                 r.nombre as rol_nombre,
                 e.id as empresa_id,
@@ -54,9 +55,9 @@ export async function POST(request: Request) {
             let query = `
                 UPDATE usuarios 
                 SET nombre = $1, email = $2, id_rol = $3, id_empresa = $4, activo = $5, 
-                    puesto = $6, telefono = $7, direccion = $8
+                    puesto = $6, telefono = $7, direccion = $8, avatar_url = $9
             `;
-            const params: any[] = [nombre, email, id_rol, id_empresa, activo, puesto, telefono, direccion];
+            const params: any[] = [nombre, email, id_rol, id_empresa, activo, puesto, telefono, direccion, body.avatar_url];
 
             if (password_hash) {
                 query += `, password_hash = $9 WHERE id_usuario = $10`;
@@ -71,8 +72,8 @@ export async function POST(request: Request) {
         } else {
             // Create
             const query = `
-                INSERT INTO usuarios (nombre, email, id_rol, id_empresa, activo, puesto, telefono, direccion, password_hash)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                INSERT INTO usuarios (nombre, email, id_rol, id_empresa, activo, puesto, telefono, direccion, avatar_url, password_hash)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 RETURNING *
             `;
             const result = await pool.query(query, [
@@ -84,7 +85,8 @@ export async function POST(request: Request) {
                 puesto,
                 telefono,
                 direccion,
-                password_hash || hashPassword(Math.random().toString(36)) // Default random pass if not provided
+                body.avatar_url,
+                password_hash || hashPassword(Math.random().toString(36))
             ]);
             return NextResponse.json(result.rows[0]);
         }

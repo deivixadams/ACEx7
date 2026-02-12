@@ -21,7 +21,8 @@ import {
     MoreVertical,
     Lock,
     Eye,
-    EyeOff
+    EyeOff,
+    Camera
 } from 'lucide-react';
 
 interface Role {
@@ -70,6 +71,7 @@ const UsersView = () => {
         telefono: '',
         direccion: '',
         password: '',
+        avatar_url: '',
         activo: true
     });
 
@@ -112,7 +114,8 @@ const UsersView = () => {
             puesto: user.puesto || '',
             telefono: user.telefono || '',
             direccion: user.direccion || '',
-            password: '', // Never fill password
+            password: '',
+            avatar_url: (user as any).avatar_url || '',
             activo: user.activo
         });
         setShowForm(true);
@@ -121,7 +124,8 @@ const UsersView = () => {
     const resetForm = () => {
         setFormData({
             nombre: '', email: '', id_rol: 0, id_empresa: '0',
-            puesto: '', telefono: '', direccion: '', password: '', activo: true
+            puesto: '', telefono: '', direccion: '', password: '',
+            avatar_url: '', activo: true
         });
         setEditingUser(null);
         setShowForm(false);
@@ -403,6 +407,68 @@ const UsersView = () => {
                                             <option value="0">Seleccionar Empresa...</option>
                                             {companies.map(c => <option key={c.id} value={String(c.id)}>{c.nombre}</option>)}
                                         </select>
+                                    </div>
+                                </div>
+
+                                {/* Avatar Selection Section */}
+                                <div className="space-y-4 pt-6">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Avatar Identitario (Máx 500k)</label>
+                                    <div className="flex flex-wrap gap-4 items-center">
+                                        {/* Predefined Avatars Gallery */}
+                                        {[
+                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
+                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Sheba',
+                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Simba',
+                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper'
+                                        ].map((url, idx) => (
+                                            <button
+                                                key={idx}
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, avatar_url: url })}
+                                                className={`w-14 h-14 rounded-2xl overflow-hidden border-4 transition-all hover:scale-110 ${formData.avatar_url === url ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'}`}
+                                            >
+                                                <img src={url} alt="Avatar" className="w-full h-full object-cover" />
+                                            </button>
+                                        ))}
+
+                                        {/* Custom Upload Button */}
+                                        <label className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all relative overflow-hidden group">
+                                            {formData.avatar_url && !formData.avatar_url.includes('dicebear') ? (
+                                                <img src={formData.avatar_url} alt="Custom" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Camera className="h-5 w-5 text-slate-400 group-hover:text-primary" />
+                                            )}
+                                            <input
+                                                type="file"
+                                                className="sr-only"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        if (file.size > 500 * 1024) {
+                                                            alert('La imagen no debe superar los 500KB');
+                                                            return;
+                                                        }
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => {
+                                                            setFormData({ ...formData, avatar_url: reader.result as string });
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+
+                                        {formData.avatar_url && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, avatar_url: '' })}
+                                                className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
+                                            >
+                                                Remover
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
