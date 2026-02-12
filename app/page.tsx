@@ -17,6 +17,7 @@ import RequirementsView from './components/views/RequirementsView';
 import ControlsView from './components/views/ControlsView';
 import TestsView from './components/views/TestsView';
 import SummaryView from './components/views/SummaryView';
+import CompanyView from './components/views/CompanyView';
 
 interface AuditItem {
   id: string;
@@ -254,16 +255,7 @@ export default function Dashboard() {
 
             {/* Management Placeholders */}
             {currentView === 'company' && (
-              <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                  <Building className="h-8 w-8" />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-800">Gestión de Empresa</h2>
-                <p className="text-slate-500 max-w-md mx-auto">Configuración de perfiles, sedes y datos generales de la organización auditada.</p>
-                <div className="pt-4">
-                  <span className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-xs font-bold uppercase tracking-widest">Módulo en Desarrollo</span>
-                </div>
-              </div>
+              <CompanyView />
             )}
 
             {currentView === 'users' && (
