@@ -188,7 +188,8 @@ function buildDocx(
   controls: any[],
   results: Record<string, string> | undefined,
   compliance: Record<string, string> | undefined,
-  conclusion: string
+  conclusion: string,
+  isReq: boolean
 ) {
   const now = new Date();
   const children: Paragraph[] = [];
@@ -202,7 +203,7 @@ function buildDocx(
   );
   children.push(
     new Paragraph({
-      text: 'Cumplimiento Normativo para Controles',
+      text: isReq ? 'Cumplimiento Normativo para Requerimientos' : 'Cumplimiento Normativo para Controles',
       heading: HeadingLevel.HEADING_2,
       spacing: { after: 120 },
     })
@@ -220,7 +221,7 @@ function buildDocx(
   controls.forEach((control: any) => {
     children.push(
       new Paragraph({
-        text: `Nombre del control: ${control.nombre}`,
+        text: isReq ? `Nombre del requerimiento: ${control.nombre}` : `Nombre del control: ${control.nombre}`,
         heading: HeadingLevel.HEADING_3,
         spacing: { before: 200, after: 120 },
       })
@@ -229,7 +230,7 @@ function buildDocx(
     if (control.descripcion) {
       children.push(
         new Paragraph({
-          text: control.descripcion,
+          text: isReq ? `Descripción del requerimiento: ${control.descripcion}` : control.descripcion,
           spacing: { after: 120 },
         })
       );
@@ -502,7 +503,7 @@ export async function POST(request: Request) {
     metadata: { hasConclusion: Boolean(conclusion) },
   });
   const docStart = Date.now();
-  const doc = buildDocx(controls, body.results, body.compliance, conclusion);
+  const doc = buildDocx(controls, body.results, body.compliance, conclusion, isReq);
   const buffer = await Packer.toBuffer(doc);
   await writeControlLog({
     targetIds,
