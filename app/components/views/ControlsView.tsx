@@ -12,6 +12,8 @@ type ReviewControl = {
     id_control: string;
     nombre: string;
     descripcion: string | null;
+    criticidad: number | null;
+    criticidad_etiqueta: string | null;
     riesgos: Array<{
         id_riesgo: string;
         descripcion: string | null;
@@ -130,6 +132,46 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
         await downloadWordFile(reviewControls.map((c) => c.id_control), results, compliance);
     };
 
+    const maturity = useMemo(() => {
+        const total = reviewControls.length;
+        if (total === 0) return { ic: 0, score: 1, gatingReason: '' };
+
+        let sum = 0;
+        let noCumpleCount = 0;
+        let hasCriticalNoCumple = false;
+
+        reviewControls.forEach((c) => {
+            const state = compliance[c.id_control] || '';
+            if (state === 'cumple') sum += 1.0;
+            if (state === 'parcial') sum += 0.5;
+            if (state === 'no_cumple') {
+                sum += 0.0;
+                noCumpleCount += 1;
+                if (c.criticidad === 2) hasCriticalNoCumple = true;
+            }
+            if (state === '') sum += 0.0;
+        });
+
+        const ic = sum / total;
+
+        if (noCumpleCount / total > 0.3) {
+            return { ic, score: 1, gatingReason: 'Mas del 30% No cumple' };
+        }
+
+        let score = 1;
+        if (ic >= 0.9) score = 5;
+        else if (ic >= 0.75) score = 4;
+        else if (ic >= 0.6) score = 3;
+        else if (ic >= 0.4) score = 2;
+        else score = 1;
+
+        if (hasCriticalNoCumple && score > 2) {
+            return { ic, score: 2, gatingReason: 'No cumple en control critico' };
+        }
+
+        return { ic, score, gatingReason: '' };
+    }, [reviewControls, compliance]);
+
     if (isLoading) {
         return <div className="animate-pulse h-96 bg-slate-100 rounded-xl w-full" />;
     }
@@ -159,7 +201,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider shadow-md hover:bg-emerald-700 transition-all"
                     >
                         <BookOpen className="h-4 w-4" />
-                        Guias de revision
+                        Guías de revisión
                     </button>
                     <button
                         onClick={clearSelection}
@@ -171,7 +213,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                         }`}
                     >
                         <FilterX className="h-4 w-4" />
-                        Limpiar seleccion
+                        Limpiar selección
                     </button>
                 </div>
             </div>
@@ -182,7 +224,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                         <tr className="text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                             <th className="px-4 py-3 w-10 bg-slate-50">&nbsp;</th>
                             <th className="px-6 py-3 w-48 bg-slate-50">Nombre</th>
-                            <th className="px-6 py-3 min-w-[200px] bg-slate-50">Descripcion</th>
+                            <th className="px-6 py-3 min-w-[200px] bg-slate-50">Descripción</th>
                             <th className="px-6 py-3 w-32 bg-slate-50">Tipo</th>
                             <th className="px-6 py-3 min-w-[200px] bg-slate-50">Evidencia Esperada</th>
                         </tr>
@@ -242,7 +284,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                     <BookOpen className="h-5 w-5 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <div className="text-sm font-black text-slate-800 uppercase tracking-wider">Guias de revision</div>
+                                    <div className="text-sm font-black text-slate-800 uppercase tracking-wider">Guías de revisión</div>
                                     <div className="text-xs text-slate-500">Controles seleccionados: {selectedCount}</div>
                                 </div>
                             </div>
@@ -264,7 +306,18 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                         <div key={control.id_control} className="border border-slate-200 rounded-xl p-5">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div>
-                                                    <div className="text-lg font-bold text-slate-800">{control.nombre}</div>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-lg font-bold text-slate-800">{control.nombre}</div>
+                                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${
+                                                            control.criticidad === 2
+                                                                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                                                : control.criticidad === 1
+                                                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                                                        }`}>
+                                                            {control.criticidad_etiqueta || 'Normal'}
+                                                        </span>
+                                                    </div>
                                                     <div className="text-sm text-slate-600 mt-1">
                                                         {control.descripcion || '-'}
                                                     </div>
@@ -303,12 +356,12 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                                             {control.pruebas.map((t) => (
                                                                 <div key={t.id_prueba} className="text-xs text-slate-700">
                                                                     <div className="font-semibold">{t.nombre}{t.codigo_prueba ? ` (${t.codigo_prueba})` : ''}</div>
-                                                                    {t.como_hacer_la_prueba && <div>Como hacer la prueba: {t.como_hacer_la_prueba}</div>}
-                                                                    {t.evidencia_minima && <div>Evidencia minima: {t.evidencia_minima}</div>}
+                                                                    {t.como_hacer_la_prueba && <div>Cómo hacer la prueba: {t.como_hacer_la_prueba}</div>}
+                                                                    {t.evidencia_minima && <div>Evidencia mínima: {t.evidencia_minima}</div>}
                                                                     {t.fuente_evidencia && <div>Fuente evidencia: {t.fuente_evidencia}</div>}
-                                                                    {t.criterio_aceptacion && <div>Criterio aceptacion: {t.criterio_aceptacion}</div>}
+                                                                    {t.criterio_aceptacion && <div>Criterio aceptación: {t.criterio_aceptacion}</div>}
                                                                     {t.muestreo_sugerido && <div>Muestreo sugerido: {t.muestreo_sugerido}</div>}
-                                                                    {t.descripcion && <div>Descripcion: {t.descripcion}</div>}
+                                                                    {t.descripcion && <div>Descripción: {t.descripcion}</div>}
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -317,7 +370,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                             </div>
 
                                             <div className="mt-4">
-                                                <label className="text-xs font-bold uppercase text-slate-600">Resultado de evaluacion (max 2000 caracteres)</label>
+                                                <label className="text-xs font-bold uppercase text-slate-600">Resultado de evaluación (max 2000 caracteres)</label>
                                                 <div className="mt-3 flex flex-wrap items-center gap-4">
                                                     <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
                                                         <input
@@ -370,7 +423,18 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                             )}
                         </div>
 
-                        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3">
+                        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
+                                <span>IC: {maturity.ic.toFixed(2)}</span>
+                                <span className="px-2 py-1 rounded-full bg-slate-100 border border-slate-200">
+                                    Madurez: {maturity.score}
+                                </span>
+                                {maturity.gatingReason && (
+                                    <span className="text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full">
+                                        {maturity.gatingReason}
+                                    </span>
+                                )}
+                            </div>
                             <button
                                 onClick={handleEvaluate}
                                 className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-emerald-700"

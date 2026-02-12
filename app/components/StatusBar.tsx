@@ -13,7 +13,7 @@ const StatusBar = () => {
                 <div className="h-3 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 hover:text-white/60 transition-colors cursor-pointer">
                     <Database className="h-3 w-3" />
-                    <span>PORT: 3001</span>
+                    <span>PORT: 3000</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5">

@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
-import StatusBar from "./components/StatusBar";
-import { ThemeProvider } from "./components/ThemeProvider";
 import { SidebarProvider } from "./context/SidebarContext";
 import LayoutWrapper from "./components/LayoutWrapper";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ACEx7 Dashboard",
