@@ -336,180 +336,184 @@ const UsersView = () => {
                             <Shield className="absolute -left-20 -bottom-20 h-64 w-64 text-white/5 -rotate-12" />
                         </div>
 
-                        {/* Form Body - Full scale and no scrollbar */}
-                        <div className="flex-1 p-10 lg:p-16 relative">
+                        {/* Form Body - Scrollable and Sticky Footer */}
+                        <div className="flex-1 p-10 lg:p-16 relative flex flex-col h-full overflow-hidden">
                             <button onClick={resetForm} className="absolute top-10 right-10 p-3 hover:bg-slate-100 rounded-2xl text-slate-400 group transition-all z-30">
                                 <X className="h-7 w-7 group-hover:rotate-90 transition-transform" />
                             </button>
 
-                            <form onSubmit={handleSubmit} className="space-y-12">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                                    <FormInput
-                                        label="Nombre Profesional"
-                                        icon={<User className="h-4 w-4" />}
-                                        value={formData.nombre}
-                                        onChange={(v: string) => setFormData({ ...formData, nombre: v })}
-                                        placeholder="Ej. Alexander Pierce"
-                                    />
-                                    <FormInput
-                                        label="Business Email (Username) *"
-                                        icon={<Mail className="h-4 w-4" />}
-                                        value={formData.email}
-                                        onChange={(v: string) => setFormData({ ...formData, email: v })}
-                                        placeholder="a.pierce@corporate.com"
-                                        type="email"
-                                        required={true}
-                                    />
-                                    <FormInput
-                                        label="Posición / Cargo"
-                                        icon={<Briefcase className="h-4 w-4" />}
-                                        value={formData.puesto}
-                                        onChange={(v: string) => setFormData({ ...formData, puesto: v })}
-                                        placeholder="Director de Auditoría"
-                                    />
-                                    <FormInput
-                                        label="Línea Telefónica Directa"
-                                        icon={<Phone className="h-4 w-4" />}
-                                        value={formData.telefono}
-                                        onChange={(v: string) => setFormData({ ...formData, telefono: v })}
-                                        placeholder="+57 321 000 0000"
-                                    />
-                                </div>
-
-                                <FormInput
-                                    label="Dirección de Instalaciones"
-                                    icon={<MapPin className="h-4 w-4" />}
-                                    value={formData.direccion}
-                                    onChange={(v: string) => setFormData({ ...formData, direccion: v })}
-                                    placeholder="Avenida Principal #12-34, Bogota"
-                                    required={false}
-                                />
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jerarquía de Seguridad *</label>
-                                        <select
-                                            value={formData.id_rol}
-                                            onChange={e => setFormData({ ...formData, id_rol: parseInt(e.target.value) })}
-                                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:border-primary transition-all appearance-none cursor-pointer"
-                                        >
-                                            <option value={0}>Seleccionar Rol...</option>
-                                            {roles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Entidad de Cumplimiento</label>
-                                        <select
-                                            value={formData.id_empresa}
-                                            onChange={e => setFormData({ ...formData, id_empresa: e.target.value })}
-                                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:border-primary transition-all appearance-none cursor-pointer"
-                                        >
-                                            <option value="0">Seleccionar Empresa...</option>
-                                            {companies.map(c => <option key={c.id} value={String(c.id)}>{c.nombre}</option>)}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {/* Avatar Selection Section */}
-                                <div className="space-y-4 pt-6">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Avatar Identitario (Máx 500k)</label>
-                                    <div className="flex flex-wrap gap-4 items-center">
-                                        {/* Predefined Avatars Gallery */}
-                                        {[
-                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
-                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
-                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Sheba',
-                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Simba',
-                                            'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper'
-                                        ].map((url, idx) => (
-                                            <button
-                                                key={idx}
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, avatar_url: url })}
-                                                className={`w-14 h-14 rounded-2xl overflow-hidden border-4 transition-all hover:scale-110 ${formData.avatar_url === url ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'}`}
-                                            >
-                                                <img src={url} alt="Avatar" className="w-full h-full object-cover" />
-                                            </button>
-                                        ))}
-
-                                        {/* Custom Upload Button */}
-                                        <label className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all relative overflow-hidden group">
-                                            {formData.avatar_url && !formData.avatar_url.includes('dicebear') ? (
-                                                <img src={formData.avatar_url} alt="Custom" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Camera className="h-5 w-5 text-slate-400 group-hover:text-primary" />
-                                            )}
-                                            <input
-                                                type="file"
-                                                className="sr-only"
-                                                accept="image/*"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
-                                                        if (file.size > 500 * 1024) {
-                                                            alert('La imagen no debe superar los 500KB');
-                                                            return;
-                                                        }
-                                                        const reader = new FileReader();
-                                                        reader.onloadend = () => {
-                                                            setFormData({ ...formData, avatar_url: reader.result as string });
-                                                        };
-                                                        reader.readAsDataURL(file);
-                                                    }
-                                                }}
-                                            />
-                                        </label>
-
-                                        {formData.avatar_url && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, avatar_url: '' })}
-                                                className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
-                                            >
-                                                Remover
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 pt-6 bg-slate-50 p-10 rounded-[2rem] border border-slate-100 relative overflow-hidden">
-                                    <div className="flex items-center justify-between relative z-10">
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seguridad de Acceso *</span>
-                                            <p className="text-xs font-bold text-slate-600">Configurar contraseña cifrada con hashing PBKDF2</p>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, activo: !formData.activo })}
-                                            className={`w-14 h-8 rounded-full p-1 transition-all duration-500 ${formData.activo ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-300'}`}
-                                        >
-                                            <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-500 border border-slate-50 transform ${formData.activo ? 'translate-x-6' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-
-                                    <div className="relative pt-4 z-10">
-                                        <div className="absolute right-5 top-1/2 -translate-y-1/2 z-20 text-slate-400 hover:text-primary cursor-pointer mt-2" onClick={() => setShowPassword(!showPassword)}>
-                                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                                        </div>
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            required={!editingUser}
-                                            value={formData.password}
-                                            onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                            placeholder={editingUser ? "Dejar en blanco para conservar actual" : "Establecer contraseña maestra"}
-                                            className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:border-primary transition-all pr-14"
+                            <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+                                <div className="flex-1 overflow-y-auto pr-6 custom-scrollbar space-y-12 pb-12">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                        <FormInput
+                                            label="Nombre Profesional"
+                                            icon={<User className="h-4 w-4" />}
+                                            value={formData.nombre}
+                                            onChange={(v: string) => setFormData({ ...formData, nombre: v })}
+                                            placeholder="Ej. Alexander Pierce"
+                                        />
+                                        <FormInput
+                                            label="Business Email (Username) *"
+                                            icon={<Mail className="h-4 w-4" />}
+                                            value={formData.email}
+                                            onChange={(v: string) => setFormData({ ...formData, email: v })}
+                                            placeholder="a.pierce@corporate.com"
+                                            type="email"
+                                            required={true}
+                                        />
+                                        <FormInput
+                                            label="Posición / Cargo"
+                                            icon={<Briefcase className="h-4 w-4" />}
+                                            value={formData.puesto}
+                                            onChange={(v: string) => setFormData({ ...formData, puesto: v })}
+                                            placeholder="Director de Auditoría"
+                                        />
+                                        <FormInput
+                                            label="Línea Telefónica Directa"
+                                            icon={<Phone className="h-4 w-4" />}
+                                            value={formData.telefono}
+                                            onChange={(v: string) => setFormData({ ...formData, telefono: v })}
+                                            placeholder="+57 321 000 0000"
                                         />
                                     </div>
-                                    <div className="absolute right-0 top-0 h-full w-1/4 bg-white/5 z-0" />
+
+                                    <FormInput
+                                        label="Dirección de Instalaciones"
+                                        icon={<MapPin className="h-4 w-4" />}
+                                        value={formData.direccion}
+                                        onChange={(v: string) => setFormData({ ...formData, direccion: v })}
+                                        placeholder="Avenida Principal #12-34, Bogota"
+                                        required={false}
+                                    />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jerarquía de Seguridad *</label>
+                                            <select
+                                                value={formData.id_rol}
+                                                onChange={e => setFormData({ ...formData, id_rol: parseInt(e.target.value) })}
+                                                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:border-primary transition-all appearance-none cursor-pointer"
+                                            >
+                                                <option value={0}>Seleccionar Rol...</option>
+                                                {roles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Entidad de Cumplimiento</label>
+                                            <select
+                                                value={formData.id_empresa}
+                                                onChange={e => setFormData({ ...formData, id_empresa: e.target.value })}
+                                                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:border-primary transition-all appearance-none cursor-pointer"
+                                            >
+                                                <option value="0">Seleccionar Empresa...</option>
+                                                {companies.map(c => <option key={c.id} value={String(c.id)}>{c.nombre}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Avatar Selection Section */}
+                                    <div className="space-y-4 pt-6">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Avatar Identitario (Máx 500k)</label>
+                                        <div className="flex flex-wrap gap-4 items-center">
+                                            {/* Predefined Avatars Gallery */}
+                                            {[
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Sheba',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Simba',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper'
+                                            ].map((url, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, avatar_url: url })}
+                                                    className={`w-14 h-14 rounded-2xl overflow-hidden border-4 transition-all hover:scale-110 ${formData.avatar_url === url ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'}`}
+                                                >
+                                                    <img src={url} alt="Avatar" className="w-full h-full object-cover" />
+                                                </button>
+                                            ))}
+
+                                            {/* Custom Upload Button */}
+                                            <label className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all relative overflow-hidden group">
+                                                {formData.avatar_url && !formData.avatar_url.includes('dicebear') ? (
+                                                    <img src={formData.avatar_url} alt="Custom" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <Camera className="h-5 w-5 text-slate-400 group-hover:text-primary" />
+                                                )}
+                                                <input
+                                                    type="file"
+                                                    className="sr-only"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 500 * 1024) {
+                                                                alert('La imagen no debe superar los 500KB');
+                                                                return;
+                                                            }
+                                                            const reader = new FileReader();
+                                                            reader.onloadend = () => {
+                                                                setFormData({ ...formData, avatar_url: reader.result as string });
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                />
+                                            </label>
+
+                                            {formData.avatar_url && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, avatar_url: '' })}
+                                                    className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
+                                                >
+                                                    Remover
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 pt-6 bg-slate-50 p-10 rounded-[2rem] border border-slate-100 relative overflow-hidden">
+                                        <div className="flex items-center justify-between relative z-10">
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Seguridad de Acceso *</span>
+                                                <p className="text-xs font-bold text-slate-600">Configurar contraseña cifrada con hashing PBKDF2</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, activo: !formData.activo })}
+                                                className={`w-14 h-8 rounded-full p-1 transition-all duration-500 ${formData.activo ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-300'}`}
+                                            >
+                                                <div className={`w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-500 border border-slate-50 transform ${formData.activo ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="relative pt-4 z-10">
+                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 z-20 text-slate-400 hover:text-primary cursor-pointer mt-2" onClick={() => setShowPassword(!showPassword)}>
+                                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                            </div>
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                required={!editingUser}
+                                                value={formData.password}
+                                                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                                placeholder={editingUser ? "Dejar en blanco para conservar actual" : "Establecer contraseña maestra"}
+                                                className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:border-primary transition-all pr-14"
+                                            />
+                                        </div>
+                                        <div className="absolute right-0 top-0 h-full w-1/4 bg-white/5 z-0" />
+                                    </div>
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={isSaving}
-                                    className="w-full bg-slate-900 text-white rounded-[1.5rem] py-5 font-black uppercase tracking-[4px] text-xs shadow-2xl hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center gap-4 border-t border-white/10"
-                                >
-                                    {isSaving ? <Loader2 className="h-6 w-6 animate-spin" /> : (editingUser ? 'Finalizar Perfeccionamiento' : 'Empoderar Ejecutivo')}
-                                </button>
+                                <div className="sticky bottom-0 bg-white pt-6 pb-2 shrink-0 z-10 border-t border-slate-50">
+                                    <button
+                                        type="submit"
+                                        disabled={isSaving}
+                                        className="w-full bg-slate-900 text-white rounded-[1.5rem] py-5 font-black uppercase tracking-[4px] text-xs shadow-2xl hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center gap-4 border-t border-white/10"
+                                    >
+                                        {isSaving ? <Loader2 className="h-6 w-6 animate-spin" /> : (editingUser ? 'Finalizar Perfeccionamiento' : 'Empoderar Ejecutivo')}
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
