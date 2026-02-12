@@ -28,8 +28,6 @@ const Sidebar = () => {
         { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
         { icon: Settings, label: 'Pruebas', href: '/?view=tests', id: 'tests' },
 
-        // These seem to be separate pages based on original code, leave them as generic links for now if they exist
-        { icon: BookOpen, label: 'Corpus Auditoría', href: '/corpus', id: 'corpus' },
         { icon: Map, label: 'Gestión', href: '/territories', id: 'territories' },
     ];
 
