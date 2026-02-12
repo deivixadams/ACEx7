@@ -421,20 +421,25 @@ const UsersView = () => {
                                                 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
                                                 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sheba',
                                                 'https://api.dicebear.com/7.x/avataaars/svg?seed=Simba',
-                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper'
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Milo',
+                                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Maya'
                                             ].map((url, idx) => (
                                                 <button
                                                     key={idx}
                                                     type="button"
                                                     onClick={() => setFormData({ ...formData, avatar_url: url })}
-                                                    className={`w-14 h-14 rounded-2xl overflow-hidden border-4 transition-all hover:scale-110 ${formData.avatar_url === url ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'}`}
+                                                    className={`w-12 h-12 rounded-xl overflow-hidden border-4 transition-all hover:scale-110 ${formData.avatar_url === url ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'}`}
                                                 >
                                                     <img src={url} alt="Avatar" className="w-full h-full object-cover" />
                                                 </button>
                                             ))}
 
                                             {/* Custom Upload Button */}
-                                            <label className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all relative overflow-hidden group">
+                                            <label className="w-12 h-12 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all relative overflow-hidden group">
                                                 {formData.avatar_url && !formData.avatar_url.includes('dicebear') ? (
                                                     <img src={formData.avatar_url} alt="Custom" className="w-full h-full object-cover" />
                                                 ) : (
@@ -505,13 +510,44 @@ const UsersView = () => {
                                     </div>
                                 </div>
 
-                                <div className="sticky bottom-0 bg-white pt-6 pb-2 shrink-0 z-10 border-t border-slate-50">
+                                <div className="sticky bottom-0 bg-white pt-6 pb-2 shrink-0 z-30 flex flex-col md:flex-row gap-6 items-stretch border-t border-slate-50 mt-12 px-2">
+                                    <div className="flex-1 bg-slate-50 p-6 rounded-2xl border border-slate-100 relative overflow-hidden group/pass transition-all hover:border-primary/20">
+                                        <div className="flex items-center justify-between mb-3 relative z-10">
+                                            <div className="flex items-center gap-2">
+                                                <Lock className="h-3 w-3 text-primary animate-pulse" />
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-[2px]">Acceso Críptico PBKDF2</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, activo: !formData.activo })}
+                                                className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${formData.activo ? 'bg-primary' : 'bg-slate-300'}`}
+                                            >
+                                                <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300 transform ${formData.activo ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="relative z-10">
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-slate-400 hover:text-primary cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </div>
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                required={!editingUser}
+                                                value={formData.password}
+                                                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                                placeholder={editingUser ? "Conservar actual..." : "Contraseña Maestra"}
+                                                className="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-primary transition-all pr-12"
+                                            />
+                                        </div>
+                                    </div>
+
                                     <button
                                         type="submit"
                                         disabled={isSaving}
-                                        className="w-full bg-slate-900 text-white rounded-[1.5rem] py-5 font-black uppercase tracking-[4px] text-xs shadow-2xl hover:bg-black hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center gap-4 border-t border-white/10"
+                                        className="w-full md:w-[220px] bg-slate-900 text-white rounded-2xl py-6 font-black uppercase tracking-[3px] text-xs shadow-xl hover:bg-black hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 shrink-0"
                                     >
-                                        {isSaving ? <Loader2 className="h-6 w-6 animate-spin" /> : (editingUser ? 'Finalizar Perfeccionamiento' : 'Empoderar Ejecutivo')}
+                                        {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
+                                        {editingUser ? 'Finalizar' : 'Empoderar'}
                                     </button>
                                 </div>
                             </form>
