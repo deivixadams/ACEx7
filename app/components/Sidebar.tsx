@@ -22,8 +22,8 @@ const Sidebar = () => {
     const currentView = searchParams.get('view');
 
     const menuItems = [
-        { icon: ShieldAlert, label: 'Riesgos', href: '/?view=risks', id: 'risks' },
         { icon: LayoutDashboard, label: 'Resumen', href: '/?view=summary', id: 'summary' },
+        { icon: ShieldAlert, label: 'Riesgos', href: '/?view=risks', id: 'risks' },
         { icon: FileCheck, label: 'Requerimientos', href: '/?view=requirements', id: 'requirements' },
         { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
         { icon: Settings, label: 'Pruebas', href: '/?view=tests', id: 'tests' },
@@ -53,7 +53,7 @@ const Sidebar = () => {
                         if (item.href.startsWith('/?view=')) {
                             // It's a view toggle on the home page
                             const viewParam = item.href.split('=')[1];
-                            isActive = pathname === '/' && (currentView === viewParam || (!currentView && viewParam === 'risks' && item.id === 'risks'));
+                            isActive = pathname === '/' && (currentView === viewParam || (!currentView && viewParam === 'summary' && item.id === 'summary'));
                         } else {
                             // It's a different route
                             isActive = pathname === item.href;

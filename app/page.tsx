@@ -72,7 +72,7 @@ type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary';
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get('view') as ViewType;
-  const currentView = viewParam || 'risks';
+  const currentView = viewParam || 'summary';
 
   const [data, setData] = useState<AuditData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
