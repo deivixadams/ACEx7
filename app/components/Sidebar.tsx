@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 
 import { useSidebar } from '../context/SidebarContext';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
     const { isSidebarOpen } = useSidebar();
@@ -49,17 +50,7 @@ const Sidebar = () => {
         },
     ];
 
-    const [user, setUser] = useState<any>(null);
-
-    React.useEffect(() => {
-        const saved = sessionStorage.getItem('ace_current_user');
-        if (saved) setUser(JSON.parse(saved));
-    }, []);
-
-    const handleLogout = () => {
-        sessionStorage.removeItem('ace_current_user');
-        window.location.reload();
-    };
+    const { user, logout } = useAuth();
 
     const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({ management: true });
 
@@ -174,7 +165,7 @@ const Sidebar = () => {
                 </div>
 
                 <button
-                    onClick={handleLogout}
+                    onClick={logout}
                     className="w-full p-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-2xl transition-all flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest border border-red-500/20"
                 >
                     Finalizar Sesión

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SidebarProvider } from "./context/SidebarContext";
+import { AuthProvider } from "./context/AuthContext";
 import LayoutWrapper from "./components/LayoutWrapper";
 
 export const metadata: Metadata = {
@@ -15,9 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <SidebarProvider>
-        <LayoutWrapper>{children}</LayoutWrapper>
-      </SidebarProvider>
+      <AuthProvider>
+        <SidebarProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </SidebarProvider>
+      </AuthProvider>
     </html>
   );
 }

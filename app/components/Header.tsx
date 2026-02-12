@@ -15,10 +15,12 @@ import {
 } from 'lucide-react';
 
 import { useSidebar } from '../context/SidebarContext';
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
     const { theme, setTheme, resolvedTheme } = useTheme();
     const { isSidebarOpen, toggleSidebar } = useSidebar();
+    const { user } = useAuth();
     const [mounted, setMounted] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -122,15 +124,25 @@ const Header = () => {
                     {/* User Profile */}
                     <div className="ml-6 flex items-center gap-4 pl-6 border-l border-[var(--header-border)] group cursor-pointer transition-all hover:translate-x-1">
                         <div className="flex flex-col items-end hidden sm:flex">
-                            <span className="text-[14px] font-black text-[#1B2559] dark:text-white leading-tight tracking-tight uppercase">F. Auditor</span>
-                            <span className="text-[10px] font-black text-primary uppercase tracking-[2px] mt-0.5">PLATFORM OWNER</span>
+                            <span className="text-[14px] font-black text-[#1B2559] dark:text-white leading-tight tracking-tight uppercase truncate max-w-[150px]">
+                                {user?.nombre || 'Auditor'}
+                            </span>
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[2px] mt-0.5">
+                                {user?.rol_nombre || 'Consultor'}
+                            </span>
                         </div>
                         <div className="h-11 w-11 rounded-2xl bg-muted border-2 border-transparent group-hover:border-primary/30 overflow-hidden shadow-2xl transition-all p-0.5 group-hover:scale-110">
-                            <img
-                                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                                alt="User"
-                                className="h-full w-full object-cover rounded-xl"
-                            />
+                            {user?.avatar_url ? (
+                                <img
+                                    src={user.avatar_url}
+                                    alt="User"
+                                    className="h-full w-full object-cover rounded-xl"
+                                />
+                            ) : (
+                                <div className="h-full w-full flex items-center justify-center bg-primary/10 text-primary font-black text-sm rounded-xl">
+                                    {user?.nombre?.substring(0, 2).toUpperCase() || 'AU'}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

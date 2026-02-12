@@ -21,6 +21,7 @@ import CompanyView from './components/views/CompanyView';
 import UsersView from './components/views/UsersView';
 import RolesView from './components/views/RolesView';
 import LoginView from './components/auth/LoginView';
+import { useAuth } from './context/AuthContext';
 
 interface AuditItem {
   id: string;
@@ -85,26 +86,8 @@ export default function Dashboard() {
 
   const [data, setData] = useState<AuditData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const { user, login } = useAuth();
   const [selectedRiskIds, setSelectedRiskIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    // Check for existing session
-    const savedSession = sessionStorage.getItem('ace_current_user');
-    if (savedSession) {
-      setUser(JSON.parse(savedSession));
-    }
-  }, []);
-
-  const handleLoginSuccess = (userData: any) => {
-    setUser(userData);
-    sessionStorage.setItem('ace_current_user', JSON.stringify(userData));
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    sessionStorage.removeItem('ace_current_user');
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -195,7 +178,7 @@ export default function Dashboard() {
   }, [data, selectedRiskIds]);
 
   if (!user) {
-    return <LoginView onLoginSuccess={handleLoginSuccess} />;
+    return <LoginView onLoginSuccess={login} />;
   }
 
   return (
