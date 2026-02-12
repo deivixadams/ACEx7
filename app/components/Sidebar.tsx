@@ -30,7 +30,7 @@ const Sidebar = () => {
 
         // These seem to be separate pages based on original code, leave them as generic links for now if they exist
         { icon: BookOpen, label: 'Corpus Auditoría', href: '/corpus', id: 'corpus' },
-        { icon: Map, label: 'Territorios', href: '/territories', id: 'territories' },
+        { icon: Map, label: 'Gestión', href: '/territories', id: 'territories' },
     ];
 
     return (
