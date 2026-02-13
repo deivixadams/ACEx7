@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useState } from 'react';
-import { BookOpen, FilterX, ListFilter, ShieldCheck, X } from 'lucide-react';
+import { BookOpen, CheckSquare, FilterX, ListFilter, ShieldCheck, X } from 'lucide-react';
 
 interface ControlsViewProps {
     controls: any[];
@@ -64,6 +64,10 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
 
     const clearSelection = () => {
         setSelectedIds(new Set());
+    };
+
+    const selectAll = () => {
+        setSelectedIds(new Set(controls.map(c => c.id)));
     };
 
     const closeReview = () => {
@@ -212,6 +216,13 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                         Guías de revisión
                     </button>
                     <button
+                        onClick={selectAll}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-sm hover:bg-slate-800 transition-all"
+                    >
+                        <CheckSquare className="h-4 w-4" />
+                        Seleccionar todo
+                    </button>
+                    <button
                         onClick={clearSelection}
                         disabled={selectedCount === 0}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm ${selectedCount > 0
@@ -309,12 +320,12 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                                 <div className="animate-pulse h-48 bg-slate-100 rounded-xl w-full" />
                             ) : (
                                 <div className="space-y-8">
-                                    {reviewControls.map((control) => (
+                                    {reviewControls.map((control, index) => (
                                         <div key={control.id_control} className="border border-slate-200 rounded-xl p-5">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div>
                                                     <div className="flex items-center gap-3">
-                                                        <div className="text-lg font-bold text-slate-800">{control.nombre}</div>
+                                                        <div className="text-lg font-bold text-slate-800">{index + 1}. {control.nombre}</div>
                                                         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${control.criticidad === 2
                                                             ? 'bg-rose-50 text-rose-700 border-rose-200'
                                                             : control.criticidad === 1

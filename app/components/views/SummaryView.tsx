@@ -156,7 +156,21 @@ const ComparativeFindingsChart = ({ history }: { history: any[] }) => {
     );
 };
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const PASTEL_COLORS = [
+    '#818cf8', // Indigo
+    '#34d399', // Emerald
+    '#fbbf24', // Amber
+    '#f87171', // Red
+    '#a78bfa', // Violet
+    '#22d3ee', // Cyan
+    '#f472b6', // Pink
+    '#a3e635', // Lime
+    '#fb923c', // Orange
+    '#94a3b8', // Slate
+    '#2dd4bf', // Teal
+    '#fb7185'  // Rose
+];
 
 const SummaryView: React.FC<SummaryViewProps> = ({ summary, isLoading }) => {
     if (isLoading || !summary) {
@@ -177,40 +191,41 @@ const SummaryView: React.FC<SummaryViewProps> = ({ summary, isLoading }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
                 {/* Total Requerimientos */}
-                <VibrantMetricCard
+                {/* Total Requerimientos */}
+                <SoftMetricCard
                     title="Total Requerimientos"
                     value={summary.totalReqs}
-                    color="bg-blue-600"
+                    baseColor="blue"
                     icon={<FileText className="h-6 w-6" />}
                     trend="+12.5% vs last month"
                     sparkData={[10, 15, 8, 22, 18, 25, 30]}
                 />
 
                 {/* Total Riesgos */}
-                <VibrantMetricCard
+                <SoftMetricCard
                     title="Total Riesgos"
                     value={summary.totalRisks}
-                    color="bg-cyan-600"
+                    baseColor="cyan"
                     icon={<ShieldAlert className="h-6 w-6" />}
                     trend="+8.2% vs last week"
                     sparkData={[20, 25, 40, 30, 45, 50, 40]}
                 />
 
                 {/* Total Controles */}
-                <VibrantMetricCard
+                <SoftMetricCard
                     title="Total Controles"
                     value={summary.totalControls}
-                    color="bg-emerald-600"
+                    baseColor="emerald"
                     icon={<ShieldCheck className="h-6 w-6" />}
                     trend="-2.1% vs yesterday"
                     sparkData={[60, 55, 50, 58, 62, 59, 72]}
                 />
 
                 {/* Accuracy / Dynamic Metric */}
-                <VibrantMetricCard
+                <SoftMetricCard
                     title="Nivel de Cobertura"
                     value="94%"
-                    color="bg-indigo-600"
+                    baseColor="indigo"
                     icon={<Activity className="h-6 w-6" />}
                     trend="+0.3% vs last month"
                     sparkData={[80, 82, 85, 88, 90, 92, 94]}
@@ -253,11 +268,18 @@ const SummaryView: React.FC<SummaryViewProps> = ({ summary, isLoading }) => {
                     <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={controlTypes}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="value" fill="#059669" radius={[4, 4, 0, 0]} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                <Tooltip
+                                    cursor={{ fill: '#f8fafc' }}
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                />
+                                <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={40}>
+                                    {controlTypes.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={PASTEL_COLORS[index % PASTEL_COLORS.length]} />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -288,10 +310,13 @@ const SummaryView: React.FC<SummaryViewProps> = ({ summary, isLoading }) => {
                                 />
                                 <Bar
                                     dataKey="value"
-                                    fill="#6366f1"
-                                    radius={[0, 4, 4, 0]}
+                                    radius={[0, 6, 6, 0]}
                                     barSize={20}
-                                />
+                                >
+                                    {riskTypes.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={PASTEL_COLORS[index % PASTEL_COLORS.length]} />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -442,33 +467,42 @@ const SummaryView: React.FC<SummaryViewProps> = ({ summary, isLoading }) => {
     );
 };
 
-const VibrantMetricCard = ({ title, value, color, icon, trend, sparkData }: any) => {
+const SoftMetricCard = ({ title, value, baseColor, icon, trend, sparkData }: any) => {
     const data = sparkData.map((v: number, i: number) => ({ name: i, value: v }));
 
+    const colorConfig: any = {
+        blue: { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-600', spark: '#3b82f6' },
+        cyan: { bg: 'bg-cyan-50', border: 'border-cyan-100', text: 'text-cyan-600', spark: '#0891b2' },
+        emerald: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-600', spark: '#10b981' },
+        indigo: { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-600', spark: '#6366f1' },
+    };
+
+    const config = colorConfig[baseColor] || colorConfig.blue;
+
     return (
-        <div className={`${color} p-6 rounded-2xl shadow-xl shadow-slate-200/50 flex flex-col justify-between h-44 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300`}>
+        <div className={`${config.bg} ${config.border} border p-6 rounded-2xl shadow-xl shadow-slate-200/50 flex flex-col justify-between h-44 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300`}>
             {/* Background pattern decoration */}
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition-transform duration-500">
-                {React.cloneElement(icon, { size: 120, className: "text-white" })}
+            <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-500 ${config.text}`}>
+                {React.cloneElement(icon, { size: 120 })}
             </div>
 
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-2">
-                    <p className="text-white/70 text-xs font-black uppercase tracking-[2px]">{title}</p>
-                    <div className="text-white/20">
+                    <p className={`${config.text} text-[10px] font-black uppercase tracking-[2px]`}>{title}</p>
+                    <div className={`${config.text} opacity-20`}>
                         {icon}
                     </div>
                 </div>
-                <h3 className="text-4xl font-black text-white tracking-tighter">{value}</h3>
+                <h3 className="text-4xl font-black text-slate-800 tracking-tighter">{value}</h3>
             </div>
 
             <div className="relative z-10 mt-4 flex items-end justify-between">
                 <div className="flex flex-col">
-                    <span className="text-white/90 text-[10px] font-bold flex items-center gap-1">
+                    <span className="text-slate-400 text-[10px] font-bold flex items-center gap-1">
                         {trend.includes('+') ? (
-                            <Activity className="h-3 w-3 text-emerald-300" />
+                            <Activity className="h-3 w-3 text-emerald-500" />
                         ) : (
-                            <Activity className="h-3 w-3 text-red-300 rotate-180" />
+                            <Activity className="h-3 w-3 text-red-500 rotate-180" />
                         )}
                         {trend}
                     </span>
@@ -481,7 +515,7 @@ const VibrantMetricCard = ({ title, value, color, icon, trend, sparkData }: any)
                             <Line
                                 type="monotone"
                                 dataKey="value"
-                                stroke="rgba(255,255,255,0.6)"
+                                stroke={config.spark}
                                 strokeWidth={3}
                                 dot={false}
                                 isAnimationActive={true}

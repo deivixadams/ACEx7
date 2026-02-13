@@ -14,7 +14,12 @@ import {
     Play,
     User,
     Settings,
-    LogOut
+    LogOut,
+    CreditCard,
+    Users,
+    LifeBuoy,
+    Keyboard,
+    UserCog
 } from 'lucide-react';
 
 import { useSidebar } from '../context/SidebarContext';
@@ -164,43 +169,72 @@ const Header = () => {
 
                         {/* Dropdown Menu */}
                         {isProfileOpen && (
-                            <div className="absolute right-0 top-full mt-4 w-72 bg-white dark:bg-[#111C44] rounded-[2rem] shadow-2xl border border-slate-100 dark:border-white/5 p-2 animate-in zoom-in-95 slide-in-from-top-2 duration-200 z-[60]">
-                                <div className="p-6 text-center border-b border-slate-50 dark:border-white/5 mb-2">
-                                    <div className="w-20 h-20 mx-auto bg-slate-100 rounded-full mb-4 overflow-hidden border-4 border-white shadow-lg">
-                                        {user?.avatar_url ? (
-                                            <img src={user.avatar_url} alt="User" className="h-full w-full object-cover" />
-                                        ) : (
-                                            <div className="h-full w-full flex items-center justify-center bg-primary/10 text-primary font-black text-2xl">
-                                                {user?.nombre?.substring(0, 2).toUpperCase() || 'AU'}
-                                            </div>
-                                        )}
+                            <div className="absolute right-0 top-full mt-4 w-72 bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 slide-in-from-top-2 duration-200 z-[60]">
+                                {/* Header Section */}
+                                <div className="p-6 border-b border-slate-50 bg-white">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm font-black text-slate-800 truncate max-w-[140px]">
+                                                {user?.nombre || 'John Doe'}
+                                            </span>
+                                            <span className="bg-cyan-100 text-cyan-600 dark:bg-cyan-500/20 dark:text-cyan-400 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                                                Pro Plan
+                                            </span>
+                                        </div>
+                                        <span className="text-xs font-bold text-slate-400 truncate">
+                                            {user?.email || 'john.doe@acmecorp.com'}
+                                        </span>
                                     </div>
-                                    <h4 className="text-lg font-black text-slate-800 dark:text-white leading-tight">{user?.nombre || 'Usuario'}</h4>
-                                    <p className="text-xs font-bold text-primary uppercase tracking-widest mt-1">{user?.rol_nombre || 'Rol'}</p>
                                 </div>
 
-                                <div className="p-2 space-y-1">
-                                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-3 transition-all">
-                                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center">
-                                            <User className="h-4 w-4" />
+                                {/* Menu Options */}
+                                <div className="p-3 space-y-1">
+                                    <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-500 flex items-center gap-3 transition-all group">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-colors">
+                                            <UserCog className="h-4 w-4" />
                                         </div>
-                                        Mi Perfil
+                                        Profile & Settings
                                     </button>
-                                    <button className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-3 transition-all">
-                                        <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center">
-                                            <Settings className="h-4 w-4" />
+
+                                    <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-500 flex items-center gap-3 transition-all group">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-colors">
+                                            <CreditCard className="h-4 w-4" />
                                         </div>
-                                        Configuración
+                                        Billing & Usage
+                                    </button>
+
+                                    <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-500 flex items-center gap-3 transition-all group">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-colors">
+                                            <Users className="h-4 w-4" />
+                                        </div>
+                                        Team Management
+                                    </button>
+
+                                    <div className="h-px bg-slate-50 dark:bg-white/5 my-2 mx-4" />
+
+                                    <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-sm font-bold text-slate-500 flex items-center gap-3 transition-all group">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-colors">
+                                            <LifeBuoy className="h-4 w-4" />
+                                        </div>
+                                        Support Center
+                                    </button>
+
+                                    <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 text-sm font-bold text-slate-500 flex items-center gap-3 transition-all group">
+                                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-colors">
+                                            <Keyboard className="h-4 w-4" />
+                                        </div>
+                                        Keyboard Shortcuts
                                     </button>
                                 </div>
 
-                                <div className="p-2 border-t border-slate-50 dark:border-white/5 mt-2">
+                                {/* Sign Out Section */}
+                                <div className="p-3 border-t border-slate-50 bg-white mt-1">
                                     <button
                                         onClick={logout}
-                                        className="w-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 rounded-xl px-4 py-3 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+                                        className="w-full group text-amber-500 hover:text-amber-600 rounded-xl px-4 py-3 text-sm font-black flex items-center gap-3 transition-all"
                                     >
-                                        <LogOut className="h-4 w-4" />
-                                        Finalizar Sesión
+                                        <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                        Sign Out
                                     </button>
                                 </div>
                             </div>
