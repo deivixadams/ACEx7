@@ -1,5 +1,7 @@
 'use client';
 
+import { useAuth } from '../../context/AuthContext';
+
 import React, { useState, useEffect } from 'react';
 import {
     User,
@@ -47,9 +49,11 @@ interface UserData {
     telefono: string;
     direccion: string;
     activo: boolean;
+    avatar_url?: string;
 }
 
 const UsersView = () => {
+    const { user: currentUser, login } = useAuth();
     const [users, setUsers] = useState<UserData[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [companies, setCompanies] = useState<Company[]>([]);
@@ -79,9 +83,9 @@ const UsersView = () => {
         setIsLoading(true);
         try {
             const [uRes, rRes, cRes] = await Promise.all([
-                fetch('/api/users'),
-                fetch('/api/roles'),
-                fetch('/api/companies')
+                fetch(`/api/users?t=${Date.now()}`),
+                fetch(`/api/roles?t=${Date.now()}`),
+                fetch(`/api/companies?t=${Date.now()}`)
             ]);
 
             const [uData, rData, cData] = await Promise.all([
@@ -115,7 +119,7 @@ const UsersView = () => {
             telefono: user.telefono || '',
             direccion: user.direccion || '',
             password: '',
-            avatar_url: (user as any).avatar_url || '',
+            avatar_url: user.avatar_url || '',
             activo: user.activo
         });
         setShowForm(true);
@@ -141,11 +145,45 @@ const UsersView = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editingUser ? { ...formData, id: editingUser.id } : formData)
             });
-            await res.json();
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error('Server side error:', data);
+                alert(`Error al guardar: ${data.details || data.error || 'Error desconocido'}`);
+                throw new Error(data.error || 'Failed to save');
+            }
+
+            console.log('Server response success:', data);
+
+            // Sync AuthContext if updating current user
+            if (editingUser && currentUser) {
+                const currentId = currentUser.id || (currentUser as any).id_usuario;
+                const editId = editingUser.id;
+
+                if (String(editId).toLowerCase() === String(currentId).toLowerCase()) {
+                    // Use THE DATA RETURNED FROM THE SERVER to ensure absolute persistence sync
+                    const selectedRole = roles.find(r => r.id === formData.id_rol);
+                    const selectedCompany = companies.find(c => String(c.id) === formData.id_empresa);
+
+                    const updatedUser = {
+                        ...currentUser,
+                        ...data, // Prefer server data (which now includes id_usuario as id)
+                        // Map back conventional names if they are not in the raw table record
+                        rol_nombre: selectedRole?.nombre || data.rol_nombre || currentUser.rol_nombre,
+                        empresa_nombre: selectedCompany?.nombre || data.empresa_nombre || currentUser.empresa_nombre
+                    };
+
+                    console.log('Updating AuthContext with verified server data:', updatedUser);
+                    login(updatedUser);
+                    alert('¡Perfil actualizado y persistido correctamente!');
+                }
+            }
+
             fetchData();
             resetForm();
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to save user', err);
+            // Alert already shown if server error
         } finally {
             setIsSaving(false);
         }
@@ -234,8 +272,21 @@ const UsersView = () => {
                         </div>
 
                         <div className="flex items-start gap-6">
-                            <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center transition-all shadow-inner ${user.activo ? 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white' : 'bg-slate-100 text-slate-300'}`}>
-                                <User className="h-10 w-10 font-black" />
+                            <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center transition-all shadow-inner overflow-hidden ${user.activo ? 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white' : 'bg-slate-100 text-slate-300'}`}>
+                                {editingUser?.id === user.id ? (
+                                    // Real-time preview while editing
+                                    formData.avatar_url ? (
+                                        <img src={formData.avatar_url} alt={user.nombre} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-3xl font-black">{formData.nombre.substring(0, 2).toUpperCase() || user.nombre.substring(0, 2).toUpperCase()}</span>
+                                    )
+                                ) : (
+                                    user.avatar_url ? (
+                                        <img src={user.avatar_url} alt={user.nombre} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-3xl font-black">{user.nombre.substring(0, 2).toUpperCase()}</span>
+                                    )
+                                )}
                             </div>
                             <div className="space-y-1 mt-1 pr-10">
                                 <h4 className="text-2xl font-black text-slate-800 tracking-tight leading-none truncate w-full" title={user.nombre}>
@@ -326,7 +377,7 @@ const UsersView = () => {
 
                         {/* Form Body - Scrollable */}
                         <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
-                            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-8">
+                            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-8 scrollbar-gutter-stable">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <FormInput
                                         label="Nombre Profesional"
@@ -435,6 +486,17 @@ const UsersView = () => {
                                                 }
                                             }} />
                                         </label>
+
+                                        {formData.avatar_url && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, avatar_url: '' })}
+                                                className="w-10 h-10 rounded-lg border-2 border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 transition-all bg-white"
+                                                title="Remover Avatar"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 

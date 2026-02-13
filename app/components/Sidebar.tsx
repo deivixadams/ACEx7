@@ -145,32 +145,7 @@ const Sidebar = () => {
                 </nav>
             </div>
 
-            <div className="mt-auto p-4 space-y-2">
-                <div className="p-4 bg-slate-900 rounded-[2rem] border border-white/10 flex items-center gap-4 shadow-2xl">
-                    <div className="h-10 w-10 rounded-xl overflow-hidden bg-primary/20 flex items-center justify-center text-primary text-xs font-black border border-primary/20">
-                        {user?.avatar_url ? (
-                            <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                            user?.nombre?.substring(0, 2).toUpperCase() || 'AU'
-                        )}
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                        <span className="text-[11px] font-black text-white truncate uppercase tracking-tight">
-                            {user?.nombre || 'Consultor'}
-                        </span>
-                        <span className="text-[9px] text-primary font-bold uppercase tracking-[2px]">
-                            {user?.rol_nombre || 'Auditor'}
-                        </span>
-                    </div>
-                </div>
 
-                <button
-                    onClick={logout}
-                    className="w-full p-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-2xl transition-all flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest border border-red-500/20"
-                >
-                    Finalizar Sesión
-                </button>
-            </div>
         </aside>
     );
 };

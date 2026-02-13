@@ -140,3 +140,7 @@ h4 {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+.scrollbar-gutter-stable {
+  scrollbar-gutter: stable;
+}
