@@ -72,3 +72,18 @@ The skill is aware of all 33 tables in `db_app_compliance`, organized by functio
 - **UI Components:** Use high-fidelity "Profile Cards" for identity management and side-entry forms for CRUD operations.
 - **DB Migrations:** When `psql` is unavailable in the environment, use Node.js bridge scripts (referencing `lib/db.ts`) to execute SQL migrations.
 - **Prisma/SQL:** Refer to the schema structure in the `usuarios` and `roles` tables for all access control logic.
+
+### 5. Troubleshooting & Best Practices (Lessons Learned)
+- **State Synchronization (Header/Profile):** When updating the current user's profile, always synchronize the `AuthContext` with the data confirmed by the server. Real-time visual feedback (preview) should be used in forms to enhance UX before persistence.
+- **API Persistence & Field Alignment:** Ensure field names are consistent between the API responses and frontend props (e.g., `id_empresa` vs `empresa_id`). 
+- **Database Safety:** Always use `RETURNING *` in `UPDATE` and `INSERT` queries to verify the operation's success. Implement safety checks to prevent sending literal `"undefined"` strings to numeric/bigint columns by sanitizing inputs.
+- **Diagnostic Logging:** Implement detailed logging in both API and Frontend during complex state updates to quickly identify field mismatches or database constraints.
+### 6. Dashboard & Data Visualization (Recharts)
+- **ApexCharts-style Tooltips**: Use a custom `Tooltip` component to render a header (label) and a body with colored indicators. This improves visual hierarchy over default tooltips.
+- **Scrollable Charts (Brush)**: For multi-month horizontal charts, use the `<Brush />` component. Set a background `LineChart` inside the brush for a premium "mini-map" effect.
+- **Vertical Cursor**: Customizing the `Tooltip` cursor (dashed, high-contrast) helps identify data points in dense charts.
+
+### 7. API Data Augmentation (Demo/Illustrative Data)
+- **Coverage Padding**: When building charts that require historical context (e.g., 3-year comparisons), implement an augmentation layer in the API.
+- **Merge Logic**: Instead of just using dummy data if empty, check month-by-month and year-by-year. Pad missing entries with illustrative trends while preserving any real database records.
+- **Demo Mode**: This ensures the UI is always "production-ready" for presentations even when the underlying data is sparse.
