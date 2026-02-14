@@ -426,12 +426,23 @@ const EvaluationView: React.FC<EvaluationViewProps> = ({ entities, onClose, audi
 
                                 <div className="flex items-center gap-3">
                                     {[
-                                        { id: 'cumple', label: 'Cumple', color: 'emerald', icon: Check },
-                                        { id: 'parcial', label: 'Parcial', color: 'amber', icon: AlertCircle },
-                                        { id: 'no_cumple', label: 'No Cumple', color: 'rose', icon: X }
+                                        {
+                                            id: 'cumple', label: 'Cumple', icon: Check,
+                                            active: 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm',
+                                            iconActive: 'text-emerald-500'
+                                        },
+                                        {
+                                            id: 'parcial', label: 'Parcial', icon: AlertCircle,
+                                            active: 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm',
+                                            iconActive: 'text-amber-500'
+                                        },
+                                        {
+                                            id: 'no_cumple', label: 'No Cumple', icon: X,
+                                            active: 'bg-rose-50 border-rose-500 text-rose-700 shadow-sm',
+                                            iconActive: 'text-rose-500'
+                                        }
                                     ].map((opt) => {
                                         const isActive = compliance[currentEntity.id_control] === opt.id;
-                                        const colorClass = opt.color === 'emerald' ? 'emerald' : opt.color === 'amber' ? 'amber' : 'rose';
 
                                         return (
                                             <button
@@ -440,11 +451,11 @@ const EvaluationView: React.FC<EvaluationViewProps> = ({ entities, onClose, audi
                                                 className={`
                                                     flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border-2
                                                     ${isActive
-                                                        ? `bg-${colorClass}-50 border-${colorClass}-500 text-${colorClass}-700 shadow-sm`
+                                                        ? opt.active
                                                         : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}
                                                 `}
                                             >
-                                                <opt.icon className={`h-3.5 w-3.5 ${isActive ? `text-${colorClass}-500` : ''}`} />
+                                                <opt.icon className={`h-3.5 w-3.5 ${isActive ? opt.iconActive : ''}`} />
                                                 {opt.label}
                                             </button>
                                         );
