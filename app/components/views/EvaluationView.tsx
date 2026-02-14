@@ -159,15 +159,37 @@ const EvaluationView: React.FC<EvaluationViewProps> = ({ entities, onClose, audi
 
     const refineFindingWithAI = async () => {
         const id = currentEntity.id_control;
-        const text = results[id];
-        if (!text || text.length < 5) return;
+        const existingText = results[id] || '';
+        const complianceState = compliance[id] || '';
 
         setIsRefining(true);
         try {
             const res = await fetch('/api/ai/refine-text', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, field: 'hallazgo' })
+                body: JSON.stringify({
+                    type: 'hallazgo_evaluation',
+                    text: existingText,
+                    field: 'hallazgo',
+                    context: {
+                        controlName: currentEntity.nombre,
+                        controlDescription: currentEntity.descripcion,
+                        criticidad: currentEntity.criticidad_etiqueta,
+                        complianceState,
+                        risks: currentEntity.riesgos.map(r => ({
+                            descripcion: r.descripcion,
+                            tipo: r.tipo,
+                            nivel_riesgo: r.nivel_riesgo,
+                            impacto: r.impacto
+                        })),
+                        tests: currentEntity.pruebas.map(t => ({
+                            nombre: t.nombre,
+                            como_hacer: t.como_hacer_la_prueba,
+                            evidencia_minima: t.evidencia_minima,
+                            criterio_aceptacion: t.criterio_aceptacion
+                        }))
+                    }
+                })
             });
             const data = await res.json();
             if (data.refinedText) {
@@ -438,7 +460,7 @@ const EvaluationView: React.FC<EvaluationViewProps> = ({ entities, onClose, audi
                                     </label>
                                     <button
                                         onClick={refineFindingWithAI}
-                                        disabled={isRefining || !results[currentEntity.id_control]}
+                                        disabled={isRefining}
                                         className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:text-emerald-700 transition-colors group disabled:opacity-30"
                                     >
                                         {isRefining ? (

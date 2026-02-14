@@ -25,6 +25,86 @@ export async function POST(request: NextRequest) {
             });
         }
 
+        // Handle AI-assisted evaluation finding generation
+        if (type === 'hallazgo_evaluation' && context) {
+            const { controlName, controlDescription, criticidad, complianceState, risks: ctxRisks, tests: ctxTests } = context;
+
+            const risksBlock = (ctxRisks || []).map((r: any, i: number) =>
+                `  ${i + 1}. "${r.descripcion}" — Tipo: ${r.tipo || 'N/A'}, Nivel: ${r.nivel_riesgo || 'N/A'}, Impacto: ${r.impacto || 'N/A'}`
+            ).join('\n') || '  (Ninguno)';
+
+            const testsBlock = (ctxTests || []).map((t: any, i: number) =>
+                `  ${i + 1}. "${t.nombre}"${t.como_hacer ? ` — Pasos: ${t.como_hacer}` : ''}${t.evidencia_minima ? ` — Evidencia: ${t.evidencia_minima}` : ''}${t.criterio_aceptacion ? ` — Criterio: ${t.criterio_aceptacion}` : ''}`
+            ).join('\n') || '  (Ninguna)';
+
+            const complianceLabel = complianceState === 'cumple' ? 'CUMPLE'
+                : complianceState === 'no_cumple' ? 'NO CUMPLE'
+                    : complianceState === 'parcial' ? 'CUMPLE PARCIALMENTE'
+                        : 'AÚN NO EVALUADO';
+
+            const hasExistingText = text && text.trim().length >= 3;
+
+            const model = process.env.LLM_MODEL || 'mistral-7b';
+            const useSystemRole = process.env.LLM_SYSTEM_ROLE !== 'false';
+
+            const systemPrompt = `Eres un auditor senior especializado en AML/CFT (Ley 155-17, República Dominicana). Tu tarea es redactar hallazgos de auditoría profesionales y técnicos.
+
+REGLAS OBLIGATORIAS:
+1. RESPONDE SIEMPRE Y ÚNICAMENTE EN ESPAÑOL.
+2. Redacta entre 80 y 800 caracteres.
+3. Tono: formal, técnico, ejecutivo. Como un hallazgo de un informe de auditoría real.
+4. NO incluyas saludos, encabezados, explicaciones, etiquetas ni formato Markdown. SOLO el texto corrido del hallazgo.
+5. Estructura recomendada: (a) Condición observada, (b) Criterio o norma aplicable, (c) Causa probable, (d) Efecto o riesgo derivado, (e) Recomendación.
+6. Si el dictamen es CUMPLE, redacta una observación positiva confirmando la efectividad del control.
+7. Si el dictamen es NO CUMPLE o PARCIAL, identifica la brecha y proporciona una recomendación concreta.`;
+
+            const userPrompt = `CONTEXTO DE EVALUACIÓN:
+- Control evaluado: "${controlName}"
+- Descripción: "${controlDescription || 'Sin descripción detallada'}"
+- Criticidad: ${criticidad || 'No definida'}
+- Dictamen de auditoría: ${complianceLabel}
+
+RIESGOS ASOCIADOS:
+${risksBlock}
+
+PROCEDIMIENTOS DE PRUEBA:
+${testsBlock}
+
+${hasExistingText
+                    ? `TEXTO DEL AUDITOR (mejora y complementa esto profesionalmente):\n"${text}"`
+                    : `No hay texto previo. Genera un hallazgo profesional completo basado en el contexto proporcionado y el dictamen ${complianceLabel}.`
+                }
+
+Redacta el hallazgo de auditoría:`;
+
+            const messages = useSystemRole
+                ? [
+                    { role: 'system' as const, content: systemPrompt },
+                    { role: 'user' as const, content: userPrompt }
+                ]
+                : [
+                    { role: 'user' as const, content: `${systemPrompt}\n\n${userPrompt}` }
+                ];
+
+            try {
+                console.log(`[AI] Hallazgo evaluation: control="${controlName}" compliance="${complianceState}" hasText=${hasExistingText}`);
+                const response = await llmStudioChat({ model, messages });
+
+                if (!response.ok) {
+                    console.error('LLM Error:', response.status, await response.text());
+                    throw new Error('Error en la comunicación con el modelo local.');
+                }
+
+                const data = await response.json();
+                const refinedText = data.choices?.[0]?.message?.content?.trim() || 'Error al generar contenido.';
+
+                return NextResponse.json({ refinedText });
+            } catch (error) {
+                console.error('AI Hallazgo Error:', error);
+                return NextResponse.json({ error: 'Error al procesar el hallazgo con IA.' }, { status: 500 });
+            }
+        }
+
         if (!text && !field) {
             return NextResponse.json({ error: 'No se proporcionó texto ni campo para procesar.' }, { status: 400 });
         }
