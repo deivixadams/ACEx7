@@ -460,7 +460,7 @@ const EvaluationView: React.FC<EvaluationViewProps> = ({ entities, onClose, audi
                                     </label>
                                     <button
                                         onClick={refineFindingWithAI}
-                                        disabled={isRefining}
+                                        disabled={isRefining || !results[currentEntity.id_control]}
                                         className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:text-emerald-700 transition-colors group disabled:opacity-30"
                                     >
                                         {isRefining ? (
