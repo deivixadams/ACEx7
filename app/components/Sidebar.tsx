@@ -19,7 +19,8 @@ import {
     Settings,
     ShieldCheck,
     ShieldAlert,
-    FileText
+    FileText,
+    ClipboardList
 } from 'lucide-react';
 
 import { useSidebar } from '../context/SidebarContext';
@@ -39,12 +40,13 @@ const Sidebar = () => {
             id: 'auditar',
             href: '#',
             subItems: [
+                { icon: ClipboardList, label: 'PreMade-Audit', href: '/?view=premade', id: 'premade' },
                 { icon: FileText, label: 'Acta de Inicio', href: '/?view=acta', id: 'acta' },
                 { icon: ShieldAlert, label: 'Riesgos', href: '/?view=risks', id: 'risks' },
+                { icon: FileCheck, label: 'Requerimientos', href: '/?view=requirements', id: 'requirements' },
+                { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
             ]
         },
-        { icon: FileCheck, label: 'Requerimientos', href: '/?view=requirements', id: 'requirements' },
-        { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
         { icon: Settings, label: 'Pruebas', href: '/?view=tests', id: 'tests' },
         {
             icon: Map,
