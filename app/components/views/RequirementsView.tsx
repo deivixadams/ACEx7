@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { BookOpen, FileText, FilterX, ListFilter, ShieldCheck, X } from 'lucide-react';
+import { BookOpen, CheckSquare, FileText, FilterX, ListFilter, ShieldCheck, X } from 'lucide-react';
 
 interface RequirementsViewProps {
     requirements: any[];
@@ -64,6 +64,10 @@ const RequirementsView: React.FC<RequirementsViewProps> = ({ requirements, isLoa
 
     const clearSelection = () => {
         setSelectedIds(new Set());
+    };
+
+    const selectAll = () => {
+        setSelectedIds(new Set(requirements.map(r => r.id_requerimiento)));
     };
 
     const closeReview = () => {
@@ -193,37 +197,41 @@ const RequirementsView: React.FC<RequirementsViewProps> = ({ requirements, isLoa
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <div className="flex items-center gap-4">
-                    <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-blue-600" />
-                        Requerimientos Normativos
-                    </h2>
-                    {selectedCount > 0 && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase">
-                                {selectedCount} Seleccionados
-                            </span>
-                            <button
-                                onClick={clearSelection}
-                                className="text-slate-400 hover:text-slate-600 transition-colors"
-                                title="Limpiar selección"
-                            >
-                                <FilterX className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={openReview}
-                                className="flex items-center gap-2 px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold uppercase rounded-lg hover:bg-emerald-700 transition-all shadow-sm hover:shadow-md"
-                            >
-                                <BookOpen className="h-3 w-3" />
-                                Guías de revisión
-                            </button>
-                        </div>
-                    )}
+            <div className="px-6 py-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-slate-50">
+                <h2 className="text-[11px] font-black text-slate-700 uppercase tracking-[0.15em] flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                    Requerimientos Normativos
+                </h2>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full">
+                        {requirements.length} Total
+                    </span>
+                    <button
+                        onClick={openReview}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider shadow-md hover:bg-emerald-700 transition-all"
+                    >
+                        <BookOpen className="h-4 w-4" />
+                        Iniciar
+                    </button>
+                    <button
+                        onClick={selectAll}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.1em] shadow-sm hover:bg-slate-900 transition-all"
+                    >
+                        <CheckSquare className="h-4 w-4" />
+                        Seleccionar todo
+                    </button>
+                    <button
+                        onClick={clearSelection}
+                        disabled={selectedCount === 0}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.1em] transition-all shadow-sm ${selectedCount > 0
+                            ? 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                            : 'bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed'
+                            }`}
+                    >
+                        <FilterX className="h-4 w-4" />
+                        Limpiar selección
+                    </button>
                 </div>
-                <span className="text-xs font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-full">
-                    {requirements.length} Total
-                </span>
             </div>
 
             <div className="overflow-auto max-h-[600px]">

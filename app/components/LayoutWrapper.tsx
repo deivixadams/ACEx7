@@ -16,14 +16,14 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     const { user, isLoading } = useAuth();
 
     if (isLoading) {
-        return <body className={`${inter.className} bg-slate-900 flex items-center justify-center h-screen`}>
+        return <body className={`${inter.className} bg-slate-900 flex items-center justify-center h-screen`} suppressHydrationWarning>
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
         </body>;
     }
 
     if (!user) {
         return (
-            <body className={`${inter.className} bg-background min-h-screen overflow-auto`}>
+            <body className={`${inter.className} bg-background min-h-screen overflow-auto`} suppressHydrationWarning>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="light"
@@ -37,7 +37,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
 
     return (
-        <body className={`${inter.className} flex bg-background h-screen overflow-hidden transition-all duration-300`}>
+        <body className={`${inter.className} flex bg-background h-screen overflow-hidden transition-all duration-300`} suppressHydrationWarning>
             <ThemeProvider
                 attribute="class"
                 defaultTheme="light"

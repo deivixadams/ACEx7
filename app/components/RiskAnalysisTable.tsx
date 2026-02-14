@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckSquare, ListFilter } from 'lucide-react';
 
 interface RiskItem {
@@ -18,7 +18,10 @@ interface RiskAnalysisTableProps {
     risks: RiskItem[];
     selectedIds: string[];
     onSelect: (id: string, multi: boolean) => void;
+    onSelectAll?: () => void;
+    onClear?: () => void;
     isLoading?: boolean;
+    hideHeader?: boolean;
 }
 
 type RiskLevel = 'High' | 'Medium' | 'Low' | 'Unknown';
@@ -72,7 +75,7 @@ const RiskLevelCell: React.FC<{ level: RiskLevel }> = ({ level }) => {
     return <span className="text-slate-400 text-xs font-mono">-</span>;
 };
 
-const RiskAnalysisTable: React.FC<RiskAnalysisTableProps> = ({ risks, selectedIds, onSelect, isLoading }) => {
+const RiskAnalysisTable: React.FC<RiskAnalysisTableProps> = ({ risks, selectedIds, onSelect, onSelectAll, onClear, isLoading, hideHeader }) => {
 
     if (isLoading) {
         return (
@@ -92,13 +95,30 @@ const RiskAnalysisTable: React.FC<RiskAnalysisTableProps> = ({ risks, selectedId
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        <div className={`bg-white overflow-hidden flex flex-col ${!hideHeader ? 'rounded-xl shadow-sm border border-slate-200' : ''}`}>
+            {!hideHeader && (
+                <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                    <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Matriz de Riesgos</h2>
+                </div>
+            )}
             <div className="overflow-auto max-h-[500px]">
                 <table className="w-full text-left border-collapse relative">
                     <thead className="sticky top-0 z-10 bg-slate-50 shadow-sm">
                         <tr className="text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                             <th className="px-4 py-3 w-10 text-center">
-                                <span className="sr-only">Selección</span>
+                                <input
+                                    type="checkbox"
+                                    checked={risks.length > 0 && selectedIds.length === risks.length}
+                                    onChange={(e) => {
+                                        const isChecked = e.target.checked;
+                                        if (isChecked) {
+                                            onSelectAll?.();
+                                        } else {
+                                            onClear?.();
+                                        }
+                                    }}
+                                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                />
                             </th>
                             <th className="px-4 py-3 w-32">Nivel</th>
                             <th className="px-4 py-3 min-w-[300px]">Riesgo</th>
@@ -115,19 +135,19 @@ const RiskAnalysisTable: React.FC<RiskAnalysisTableProps> = ({ risks, selectedId
                             return (
                                 <tr
                                     key={risk.id}
-                                    onClick={(e) => onSelect(risk.id, isSelected ? true : e.ctrlKey || e.metaKey)}
+                                    onClick={() => onSelect(risk.id, true)}
                                     className={`
                     group cursor-pointer transition-colors duration-150
                     ${isSelected ? 'bg-emerald-50/60' : 'hover:bg-slate-50'}
                   `}
                                 >
-                                    <td className="px-4 py-3 text-center">
-                                        <div className={`
-                      w-5 h-5 rounded border flex items-center justify-center mx-auto transition-colors
-                      ${isSelected ? 'bg-emerald-600 border-emerald-600' : 'bg-white border-slate-300 group-hover:border-emerald-400'}
-                    `}>
-                                            {isSelected && <CheckSquare className="w-3.5 h-3.5 text-white" />}
-                                        </div>
+                                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => onSelect(risk.id, true)}
+                                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                        />
                                     </td>
                                     <td className="px-4 py-3">
                                         <RiskLevelCell level={level} />
@@ -154,9 +174,11 @@ const RiskAnalysisTable: React.FC<RiskAnalysisTableProps> = ({ risks, selectedId
                     </tbody>
                 </table>
             </div>
-            <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-[10px] text-slate-400 font-medium text-right uppercase tracking-wider">
-                {risks.length} Registros
-            </div>
+            {!hideHeader && (
+                <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-[10px] text-slate-400 font-medium text-right uppercase tracking-wider">
+                    {risks.length} Registros
+                </div>
+            )}
         </div>
     );
 };

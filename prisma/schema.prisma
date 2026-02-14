@@ -174,3 +174,71 @@ model TestControlMap {
   @@id([id_prueba, id_control])
   @@map("test_control_map")
 }
+
+model ActaAuditoria {
+  id_acta                      String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_auditoria                 String               @db.Uuid
+  numero_acta                  String               @unique
+  id_empresa                   BigInt?
+  unidades_incluidas           String?
+  periodo_inicio               DateTime?            @db.Date
+  periodo_fin                  DateTime?            @db.Date
+  fecha_inicio_auditoria       DateTime?            @db.Date
+  tipo_auditoria               String?
+  tipo_auditoria_otro          String?
+  objetivo                     String?
+  alcance_excluye              String?
+  alcance_otro_detalle         String?
+  enfoque                      String?
+  tecnicas                     Json?
+  criterios_criticidad         String?
+  lider_auditor_id             String?              @db.Uuid
+  especialistas                String?
+  cronograma                   Json?
+  punto_contacto_nombre        String?
+  punto_contacto_cargo         String?
+  frecuencia_reuniones         String?
+  notas_comunicacion           String?
+  declaracion_inicio           String?
+  representante_entidad_nombre String?
+  representante_entidad_cargo  String?
+  fecha_firma                  DateTime?            @db.Date
+  estado                       String?              @default("BORRADOR")
+  created_at                   DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_at                   DateTime?            @default(now()) @db.Timestamptz(6)
+  created_by_id                String?              @db.Uuid
+
+  auditores_link               ActaAuditoresLink[]
+  alcances_link                ActaAlcancesLink[]
+
+  @@map("acta_auditoria")
+}
+
+model CatAlcanceAuditoria {
+  id_alcance  Int                 @id @default(autoincrement())
+  nombre      String              @unique
+  descripcion String?
+  activo      Boolean?            @default(true)
+  actas_link  ActaAlcancesLink[]
+
+  @@map("cat_alcance_auditoria")
+}
+
+model ActaAuditoresLink {
+  id_acta    String        @db.Uuid
+  id_usuario String        @db.Uuid
+  acta       ActaAuditoria @relation(fields: [id_acta], references: [id_acta], onDelete: Cascade)
+
+  @@id([id_acta, id_usuario])
+  @@map("acta_auditores_link")
+}
+
+model ActaAlcancesLink {
+  id_acta    String               @db.Uuid
+  id_alcance Int
+  acta       ActaAuditoria        @relation(fields: [id_acta], references: [id_acta], onDelete: Cascade)
+  alcance    CatAlcanceAuditoria  @relation(fields: [id_alcance], references: [id_alcance], onDelete: Cascade)
+
+  @@id([id_acta, id_alcance])
+  @@map("acta_alcances_link")
+}

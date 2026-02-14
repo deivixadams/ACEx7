@@ -21,6 +21,7 @@ import CompanyView from './components/views/CompanyView';
 import UsersView from './components/views/UsersView';
 import RolesView from './components/views/RolesView';
 import LoginView from './components/auth/LoginView';
+import ActaInicioView from './components/views/ActaInicioView';
 import { useAuth } from './context/AuthContext';
 
 interface AuditItem {
@@ -77,7 +78,7 @@ interface AuditData {
   summary?: any;
 }
 
-type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary' | 'company' | 'users' | 'roles' | 'library' | 'backup';
+type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary' | 'company' | 'users' | 'roles' | 'library' | 'backup' | 'acta';
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
@@ -142,6 +143,10 @@ export default function Dashboard() {
     setSelectedRiskIds([]);
   };
 
+  const selectAllRisks = () => {
+    if (data) setSelectedRiskIds(data.risks.map((r: any) => r.id));
+  };
+
   // Filter Logic for Risk View
   const { filteredControls, filteredTests } = useMemo(() => {
     if (!data) return { filteredControls: [], filteredTests: [] };
@@ -194,34 +199,21 @@ export default function Dashboard() {
               <h1 className="flex items-center gap-3">
                 <span className="bg-slate-800 text-white px-3 py-1 rounded text-sm font-black uppercase tracking-widest">
                   {currentView === 'risks' ? 'Risk View' :
-                    currentView === 'requirements' ? 'Reqs View' :
-                      currentView === 'controls' ? 'Controls View' :
-                        currentView === 'tests' ? 'Tests View' :
-                          currentView === 'company' ? 'Gestión: Empresa' :
-                            currentView === 'users' ? 'Gestión: Usuarios' :
-                              currentView === 'roles' ? 'Gestión: Roles' :
-                                currentView === 'library' ? 'Gestión: Biblioteca' :
-                                  currentView === 'backup' ? 'Gestión: Respaldo' : 'Resumen'}
+                    currentView === 'acta' ? 'Acta de Inicio' :
+                      currentView === 'requirements' ? 'Reqs View' :
+                        currentView === 'controls' ? 'Controls View' :
+                          currentView === 'tests' ? 'Tests View' :
+                            currentView === 'company' ? 'Gestión: Empresa' :
+                              currentView === 'users' ? 'Gestión: Usuarios' :
+                                currentView === 'roles' ? 'Gestión: Roles' :
+                                  currentView === 'library' ? 'Gestión: Biblioteca' :
+                                    currentView === 'backup' ? 'Gestión: Respaldo' : 'Resumen'}
                 </span>
               </h1>
             </div>
 
             <div className="flex items-center gap-3">
-              {currentView === 'risks' && (
-                <button
-                  onClick={resetSelection}
-                  disabled={selectedRiskIds.length === 0}
-                  className={`
-                      flex items-center gap-2 px-4 py-2 rounded-lg text-white text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm
-                      ${selectedRiskIds.length > 0
-                      ? 'bg-slate-700 hover:bg-slate-800 cursor-pointer'
-                      : 'bg-slate-300 cursor-not-allowed'}
-                    `}
-                >
-                  <FilterX className="h-4 w-4" />
-                  Limpiar
-                </button>
-              )}
+              {/* Contextual buttons moved into views for consistency */}
             </div>
           </div>
 
@@ -239,6 +231,8 @@ export default function Dashboard() {
                 isLoading={isLoading}
                 selectedRiskIds={selectedRiskIds}
                 onRiskSelect={handleRiskSelect}
+                onSelectAll={selectAllRisks}
+                onClearSelection={resetSelection}
                 filteredControls={filteredControls}
                 filteredTests={filteredTests}
               />
@@ -259,6 +253,14 @@ export default function Dashboard() {
               <TestsView
                 tests={data?.tests || []}
                 isLoading={isLoading}
+                testControlMaps={data?.testControlMaps || []}
+              />
+            )}
+            {currentView === 'acta' && (
+              <ActaInicioView
+                auditoriaId="DEMO-111"
+                onClose={() => window.location.href = '/?view=summary'}
+                onGoToRisks={() => window.location.href = '/?view=risks'}
               />
             )}
 

@@ -213,7 +213,7 @@ const ControlsView: React.FC<ControlsViewProps> = ({ controls, isLoading }) => {
                         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 text-white text-[11px] font-bold uppercase tracking-wider shadow-md hover:bg-emerald-700 transition-all"
                     >
                         <BookOpen className="h-4 w-4" />
-                        Guías de revisión
+                        Iniciar
                     </button>
                     <button
                         onClick={selectAll}

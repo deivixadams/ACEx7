@@ -15,9 +15,11 @@ import {
     Save,
     ChevronDown,
     ChevronRight,
-    ShieldAlert,
     BarChart3,
-    Settings
+    Settings,
+    ShieldCheck,
+    ShieldAlert,
+    FileText
 } from 'lucide-react';
 
 import { useSidebar } from '../context/SidebarContext';
@@ -31,7 +33,16 @@ const Sidebar = () => {
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Resumen', href: '/?view=summary', id: 'summary' },
-        { icon: ShieldAlert, label: 'Riesgos', href: '/?view=risks', id: 'risks' },
+        {
+            icon: ShieldCheck,
+            label: 'Auditar',
+            id: 'auditar',
+            href: '#',
+            subItems: [
+                { icon: FileText, label: 'Acta de Inicio', href: '/?view=acta', id: 'acta' },
+                { icon: ShieldAlert, label: 'Riesgos', href: '/?view=risks', id: 'risks' },
+            ]
+        },
         { icon: FileCheck, label: 'Requerimientos', href: '/?view=requirements', id: 'requirements' },
         { icon: BarChart3, label: 'Controles', href: '/?view=controls', id: 'controls' },
         { icon: Settings, label: 'Pruebas', href: '/?view=tests', id: 'tests' },
@@ -52,7 +63,10 @@ const Sidebar = () => {
 
     const { user, logout } = useAuth();
 
-    const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({ management: true });
+    const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({
+        management: true,
+        auditar: true
+    });
 
     const toggleSubMenu = (id: string) => {
         setOpenSubMenus(prev => ({ ...prev, [id]: !prev[id] }));
