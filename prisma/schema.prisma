@@ -242,3 +242,15 @@ model ActaAlcancesLink {
   @@id([id_acta, id_alcance])
   @@map("acta_alcances_link")
 }
+
+model PremadeReport {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  filename       String   @unique
+  title          String
+  description    String?
+  category       String?
+  download_count Int      @default(0)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("premade_reports")
+}
