@@ -22,6 +22,7 @@ import UsersView from './components/views/UsersView';
 import RolesView from './components/views/RolesView';
 import LoginView from './components/auth/LoginView';
 import ActaInicioView from './components/views/ActaInicioView';
+import PreAuditView from './components/views/PreAuditView';
 import { useAuth } from './context/AuthContext';
 
 interface AuditItem {
@@ -78,7 +79,7 @@ interface AuditData {
   summary?: any;
 }
 
-type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary' | 'company' | 'users' | 'roles' | 'library' | 'backup' | 'acta';
+type ViewType = 'requirements' | 'risks' | 'controls' | 'tests' | 'summary' | 'company' | 'users' | 'roles' | 'library' | 'backup' | 'acta' | 'premade';
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
@@ -261,6 +262,16 @@ export default function Dashboard() {
                 auditoriaId="DEMO-111"
                 onClose={() => window.location.href = '/?view=summary'}
                 onGoToRisks={() => window.location.href = '/?view=risks'}
+              />
+            )}
+            {currentView === 'premade' && (
+              <PreAuditView
+                data={data}
+                isLoading={isLoading}
+                selectedRiskIds={selectedRiskIds}
+                onRiskSelect={handleRiskSelect}
+                onSelectAll={selectAllRisks}
+                onClearSelection={resetSelection}
               />
             )}
 
