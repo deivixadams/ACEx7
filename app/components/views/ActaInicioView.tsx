@@ -96,7 +96,7 @@ export default function ActaInicioView({ auditoriaId, onClose, onSaveSuccess, on
     };
 
     return (
-        <div className="fixed inset-0 z-[150] bg-white text-slate-900 flex flex-col font-sans animate-in fade-in duration-500 overflow-hidden">
+        <div className="h-full bg-white text-slate-900 flex flex-col font-sans animate-in fade-in duration-500 overflow-hidden rounded-xl border border-slate-200 shadow-sm">
 
             {/* Header */}
             <div className="px-8 py-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
