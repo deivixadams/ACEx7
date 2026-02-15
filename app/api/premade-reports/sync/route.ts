@@ -43,9 +43,11 @@ export async function GET(req: NextRequest) {
 
             // Categoría sugerida a partir del nombre si contiene ciertas palabras
             let category = "Informe General";
-            if (basename.toLowerCase().includes('plaft')) category = "PLAFT / AML";
-            if (basename.toLowerCase().includes('riesgo')) category = "Gestión de Riesgos";
-            if (basename.toLowerCase().includes('control')) category = "Controles Internos";
+            const lowerFile = basename.toLowerCase();
+            if (lowerFile.includes('plaft')) category = "PLAFT / AML";
+            if (lowerFile.includes('riesgo')) category = "Gestión de Riesgos";
+            if (lowerFile.includes('control')) category = "Controles Internos";
+            if (lowerFile.includes('check') || lowerFile.includes('lista')) category = "Check list";
 
             const values = [file, cleanTitle, category, `Informe de auditoría especializado: ${cleanTitle}`];
 

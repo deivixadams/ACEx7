@@ -7,25 +7,38 @@ export async function POST(
 ) {
     try {
         const { id } = await params;
+        const { userId } = await req.json();
 
-        // Incrementar el contador de likes de forma atómica
-        const result = await pool.query(`
-            UPDATE premade_reports 
-            SET likes_count = likes_count + 1 
-            WHERE id = $1 
-            RETURNING likes_count;
-        `, [id]);
-
-        if (result.rows.length === 0) {
-            return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+        if (!userId) {
+            return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
         }
 
+        // Verificar si ya existe el like
+        const checkQuery = 'SELECT id FROM premade_likes WHERE report_id = $1 AND user_id = $2';
+        const checkResult = await pool.query(checkQuery, [id, userId]);
+
+        if (checkResult.rows.length > 0) {
+            // Remover like (Toggle off)
+            await pool.query('DELETE FROM premade_likes WHERE report_id = $1 AND user_id = $2', [id, userId]);
+        } else {
+            // Añadir like (Toggle on)
+            await pool.query('INSERT INTO premade_likes (report_id, user_id) VALUES ($1, $2)', [id, userId]);
+        }
+
+        // Obtener nuevo conteo total
+        const countResult = await pool.query('SELECT COUNT(*) as total FROM premade_likes WHERE report_id = $1', [id]);
+        const totalLikes = parseInt(countResult.rows[0].total);
+
+        // Opcional: Actualizar el cache en la tabla principal si se usa
+        await pool.query('UPDATE premade_reports SET likes_count = $1 WHERE id = $2', [totalLikes, id]);
+
         return NextResponse.json({
-            likes_count: result.rows[0].likes_count
+            likes_count: totalLikes,
+            isLiked: checkResult.rows.length === 0 // true si lo acabamos de añadir
         });
 
     } catch (error: any) {
-        console.error('Error liking report:', error);
+        console.error('Error toggling like:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
