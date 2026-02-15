@@ -27,15 +27,22 @@ export async function llmStudioChat(request: ChatRequest) {
     headers.Authorization = `Bearer ${apiKey}`;
   }
 
-  const r = await fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      model: request.model,
-      messages: request.messages,
-      stream: request.stream ?? false,
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes in milliseconds
 
-  return r;
+  try {
+    const r = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers,
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: request.model,
+        messages: request.messages,
+        stream: request.stream ?? false,
+      }),
+    });
+    return r;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
